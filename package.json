@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/postbuild.js",
     "lint": "oxlint",
+    "test": "node --test",
     "preview": "vite preview",
     "start": "vite preview"
   },

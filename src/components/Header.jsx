@@ -6,12 +6,27 @@ export default function Header({
   theme,
   onThemeToggle,
   onReset,
-  onShare
+  onShare,
+  currentRoute = 'emi',
+  onNavigate,
 }) {
+  const isSavings = currentRoute === 'savings';
+
+  const handleNavClick = (e, path) => {
+    if (onNavigate) {
+      e.preventDefault();
+      onNavigate(path);
+    }
+  };
+
   return (
     <header className="header">
       <div className="header-logo">
-        <a href="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <a
+          href="/"
+          onClick={(e) => handleNavClick(e, '/')}
+          style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="4" />
             <line x1="8" y1="8" x2="16" y2="8" />
@@ -22,8 +37,27 @@ export default function Header({
             <span>E</span>MI
           </span>
         </a>
-        <span className="header-descriptor">Loan calculator</span>
+        <span className="header-descriptor">{isSavings ? 'Savings calculator' : 'Loan calculator'}</span>
       </div>
+
+      <nav className="header-nav" aria-label="Main navigation">
+        <a
+          href="/"
+          className={`header-nav-link ${!isSavings ? 'active' : ''}`}
+          onClick={(e) => handleNavClick(e, '/')}
+          aria-current={!isSavings ? 'page' : undefined}
+        >
+          EMI Calculator
+        </a>
+        <a
+          href="/savings"
+          className={`header-nav-link ${isSavings ? 'active' : ''}`}
+          onClick={(e) => handleNavClick(e, '/savings')}
+          aria-current={isSavings ? 'page' : undefined}
+        >
+          Savings
+        </a>
+      </nav>
 
       <div className="header-actions">
         <select 

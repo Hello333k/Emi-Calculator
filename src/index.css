@@ -677,6 +677,46 @@ input[type='range']:focus-visible {
   margin-left: 4px;
 }
 
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background-color: var(--bg-elevated);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.header-nav-link {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.header-nav-link:hover {
+  color: var(--text-primary);
+}
+
+.header-nav-link.active {
+  background-color: var(--bg-surface);
+  color: var(--accent-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 600px) {
+  .header-nav-link {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+}
+
 .header-actions {
   display: flex;
   align-items: center;

@@ -42,6 +42,23 @@ export function generateShareUrl(state) {
   return params ? `${baseUrl}?${params}` : baseUrl;
 }
 
+export function encodeSavingsState(state) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(state)) {
+    if (value !== undefined && value !== null && value !== '' && value !== false) {
+      params.append(key, String(value));
+    }
+  }
+  return params.toString();
+}
+
+export function generateSavingsShareUrl(state) {
+  const params = encodeSavingsState(state);
+  const isHash = typeof window !== 'undefined' && (window.location.hash.startsWith('#/savings') || window.location.hash.startsWith('#savings'));
+  const basePath = isHash ? `${window.location.origin}/#/savings` : `${window.location.origin}/savings`;
+  return params ? `${basePath}?${params}` : basePath;
+}
+
 export async function copyToClipboard(text) {
   try {
     if (navigator.clipboard && window.isSecureContext) {

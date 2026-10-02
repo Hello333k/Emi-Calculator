@@ -1,17 +1,28 @@
-# EMI Calculator
+# Financial Calculator Suite (EMI & Savings)
 
-A fast, responsive, zero-tracking loan & EMI calculator with down payment support, interactive amortization schedules, and principal vs. interest breakdown.
+A fast, responsive, zero-tracking financial utility featuring a loan & EMI calculator and a comprehensive compound interest & savings goal calculator.
 
-## Features
+## Calculators & Features
 
+### 1. EMI Calculator
 - **Accurate Financial Calculations**: Industry-standard reducing-balance EMI formula.
 - **Down Payment Support**: Mode toggle between fixed amount and percentage, live LTV ratio, and proportional visual breakdown.
 - **Visual Analytics**: Interactive SVG donut chart and balance-over-time area visualization.
 - **Full Amortization Schedule**: Monthly and yearly breakdown with instant CSV export.
 - **Extra Payment Simulator**: Prepayment impact modeling (monthly, annual, one-time lump-sum).
-- **Privacy First**: 100% client-side calculations with zero server tracking and zero database requirements.
 - **Shareable State**: Copy calculation links with parameters preserved in the URL.
-- **Responsive & Accessible**: Works seamlessly on mobile, tablet, and desktop with both light and dark themes.
+
+### 2. Savings Calculator
+- **Dual Planning Modes**:
+  - **Growth Projection**: Project accumulated balance with recurring contributions and compound growth.
+  - **Reach a Goal**: Calculate required periodic contributions or time-to-goal to achieve target wealth.
+- **Flexible Compounding**: Support for Daily, Monthly, Quarterly, Semi-Annual, and Annual compounding, with both Nominal APR and APY.
+- **Dual Visual Growth Chart**: Interactive SVG trajectory comparing total deposits against compound interest.
+- **Savings Milestones**: Quick checkpoint projections (1 month, 6 months, 1 year, 3 years, 5 years, 10 years, 20 years, 30 years).
+- **Itemized Schedule & Export**: Year-by-year summary and month-by-month detail schedule with instant CSV export.
+- **Advanced Assumptions**: Annual step-up contribution increases, one-time deposits, inflation adjustment in today's money, annual fees, and rate sensitivity scenario comparisons.
+- **Privacy First**: 100% client-side calculations with zero cookies, zero analytics tracking, and zero database requirements.
+- **Responsive & Accessible**: Dark and light modes, keyboard navigation, and WCAG-compliant design tokens.
 
 ## Getting Started
 

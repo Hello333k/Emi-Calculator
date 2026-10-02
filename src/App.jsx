@@ -24,23 +24,9 @@ import Footer from './components/Footer';
 import ShareDialog from './components/ShareDialog';
 import Toast from './components/Toast';
 import NotFound from './components/NotFound';
+import SavingsPage from './components/SavingsPage';
 
-function CalculatorApp() {
-  // Theme management (persisted in localStorage, defaults to system preference)
-  const [theme, setTheme] = useLocalStorage('emi-theme', () => {
-    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    return 'light';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-  };
+function CalculatorApp({ onNavigate, theme, toggleTheme }) {
 
   // Central calculator state and derived values
   const {
@@ -132,6 +118,8 @@ function CalculatorApp() {
         onThemeToggle={toggleTheme}
         onReset={handleReset}
         onShare={handleOpenShare}
+        currentRoute="emi"
+        onNavigate={onNavigate}
       />
 
       <main className="container" id="main-content">
@@ -295,7 +283,7 @@ function CalculatorApp() {
         <FAQ />
       </main>
 
-      <Footer />
+      <Footer onNavigate={onNavigate} currentRoute="emi" />
 
       {/* Share Calculation Modal */}
       <ShareDialog
@@ -315,15 +303,143 @@ function CalculatorApp() {
   );
 }
 
-export default function App() {
-  const is404 = typeof window !== 'undefined' && 
-    window.location.pathname !== '/' && 
-    window.location.pathname !== '/index.html' &&
-    window.location.pathname !== '';
+function getRouteFromLocation() {
+  if (typeof window === 'undefined') return 'emi';
+  const pathname = (window.location.pathname || '').toLowerCase().replace(/\/$/, '') || '/';
+  const hash = (window.location.hash || '').toLowerCase();
 
-  if (is404) {
-    return <NotFound />;
+  // Savings route check (supports /savings, /#/savings, #savings, and query params)
+  if (
+    pathname === '/savings' ||
+    pathname.endsWith('/savings') ||
+    hash.startsWith('#/savings') ||
+    hash.startsWith('#savings')
+  ) {
+    return 'savings';
   }
 
-  return <CalculatorApp />;
+  // EMI / Home route check
+  if (
+    pathname === '/' ||
+    pathname === '/index.html' ||
+    pathname === '' ||
+    hash === '' ||
+    hash === '#/' ||
+    hash === '#'
+  ) {
+    return 'emi';
+  }
+
+  return '404';
+}
+
+export default function App() {
+  const [currentRoute, setCurrentRoute] = useState(getRouteFromLocation);
+
+  // Theme management shared at top level
+  const [theme, setTheme] = useLocalStorage('emi-theme', () => {
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  });
+
+  const [currency, setCurrency] = useLocalStorage('emi-currency', 'NPR');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentRoute(getRouteFromLocation());
+    };
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+
+    // If redirected via hash (e.g. GitHub Pages /#/savings), update history state
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash.startsWith('#/savings') || hash.startsWith('#savings')) {
+        const queryIdx = hash.indexOf('?');
+        const query = queryIdx !== -1 ? hash.slice(queryIdx) : '';
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, '', '/savings' + query);
+        }
+      }
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
+  }, []);
+
+  // Synchronize document title and meta description
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (currentRoute === 'savings') {
+      document.title = 'Savings Calculator — Compound Growth & Savings Goal Calculator';
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', 'Calculate how your savings could grow with regular contributions, compound growth, different time horizons, and savings goals.');
+      }
+    } else if (currentRoute === 'emi') {
+      document.title = 'EMI Calculator — Monthly Payment, Interest & Amortization';
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', 'Calculate monthly EMI, total interest, total repayment and amortization schedule with a fast, privacy-friendly loan calculator.');
+      }
+    }
+  }, [currentRoute]);
+
+  const handleNavigate = (path) => {
+    if (typeof window !== 'undefined') {
+      const cleanPath = path.toLowerCase().replace(/\/$/, '') || '/';
+      window.history.pushState({}, '', path);
+      if (cleanPath === '/savings') {
+        setCurrentRoute('savings');
+      } else if (cleanPath === '/' || cleanPath === '/index.html') {
+        setCurrentRoute('emi');
+      } else {
+        setCurrentRoute('404');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  if (currentRoute === 'savings') {
+    return (
+      <div className="app-shell">
+        <Header
+          currency={currency}
+          onCurrencyChange={setCurrency}
+          theme={theme}
+          onThemeToggle={toggleTheme}
+          onReset={() => window.dispatchEvent(new CustomEvent('app-reset-savings'))}
+          onShare={() => window.dispatchEvent(new CustomEvent('app-share-savings'))}
+          currentRoute="savings"
+          onNavigate={handleNavigate}
+        />
+        <SavingsPage />
+        <Footer onNavigate={handleNavigate} currentRoute="savings" />
+      </div>
+    );
+  }
+
+  if (currentRoute === 'emi') {
+    return (
+      <CalculatorApp
+        onNavigate={handleNavigate}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
+    );
+  }
+
+  return <NotFound onNavigate={handleNavigate} />;
 }
