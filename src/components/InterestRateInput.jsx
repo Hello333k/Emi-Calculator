@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import NumericInput from './NumericInput';
 
 const commonRates = [6.5, 8.0, 9.5, 10.0, 12.0, 14.0];
 
@@ -9,42 +10,8 @@ export default function InterestRateInput({
   min = 0,
   max = 30
 }) {
-  const [inputValue, setInputValue] = useState(value !== '' && value !== null && value !== undefined ? value.toString() : '');
-  const [prevValue, setPrevValue] = useState(value);
-
-  // Sync state during render when prop changes externally (e.g. reset or slider)
-  if (value !== prevValue) {
-    setPrevValue(value);
-    setInputValue(value !== '' && value !== null && value !== undefined ? value.toString() : '');
-  }
-
-  const handleInputChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*\.?\d*$/.test(val)) {
-      setInputValue(val);
-      if (val === '' || val === '.') {
-        onChange('');
-      } else {
-        const parsed = parseFloat(val);
-        onChange(isNaN(parsed) ? '' : parsed);
-      }
-    }
-  };
-
-  const handleBlur = () => {
-    if (inputValue === '' || inputValue === '.') {
-      return;
-    }
-    const parsed = parseFloat(inputValue);
-    if (!isNaN(parsed)) {
-      setInputValue(parsed.toString());
-      onChange(parsed);
-    }
-  };
-
   const handleSliderChange = (e) => {
     const val = parseFloat(e.target.value);
-    setInputValue(val.toString());
     onChange(val);
   };
 
@@ -58,14 +25,12 @@ export default function InterestRateInput({
       </div>
 
       <div className="input-wrapper">
-        <input
+        <NumericInput
           id="interest-rate-input"
-          type="text"
           className={`input-field has-suffix ${error ? 'input-error' : ''}`}
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          inputMode="decimal"
+          value={value}
+          onChange={onChange}
+          isDecimal={true}
           placeholder="e.g. 10.5"
           aria-invalid={!!error}
           aria-describedby={error ? 'interest-rate-error' : undefined}
@@ -93,10 +58,7 @@ export default function InterestRateInput({
             key={rate}
             type="button"
             className="quick-amount-btn"
-            onClick={() => {
-              setInputValue(rate.toString());
-              onChange(rate);
-            }}
+            onClick={() => onChange(rate)}
           >
             {rate}%
           </button>

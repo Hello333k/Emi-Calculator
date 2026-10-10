@@ -13,10 +13,7 @@ export default function Footer({ onNavigate, currentRoute = 'emi' }) {
   return (
     <footer className="footer">
       <div className="container">
-        <div className="disclaimer" style={{ marginBottom: '24px' }}>
-          <strong>Estimates only.</strong> Actual payments and savings growth may vary due to institution-specific rounding, fees, compounding rules, payment timing, rate changes, taxes, insurance, or other account terms. This website is provided for educational and estimation purposes only and does not constitute financial advice.
-        </div>
-        <div className="footer-content">
+      <div className="footer-content">
           <div className="footer-text">
             <span>&copy; {currentYear} Financial Calculator Suite. All calculations performed client-side in your browser.</span>
           </div>

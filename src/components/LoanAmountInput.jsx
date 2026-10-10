@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import NumericInput from './NumericInput';
 
 const quickAmountsSouthAsian = [
   { label: '1 Lakh', value: 100000 },
@@ -26,51 +27,16 @@ export default function LoanAmountInput({
   min = 10000,
   max = 50000000
 }) {
-  const [inputValue, setInputValue] = useState(value !== '' && value !== null && value !== undefined ? value.toString() : '');
-  const [prevValue, setPrevValue] = useState(value);
-
-  // Sync state during render when prop changes externally (e.g. reset or slider)
-  if (value !== prevValue) {
-    setPrevValue(value);
-    setInputValue(value !== '' && value !== null && value !== undefined ? value.toString() : '');
-  }
-
   const isSouthAsian = currency === 'NPR' || currency === 'INR';
   const quickAmounts = isSouthAsian ? quickAmountsSouthAsian : quickAmountsStandard;
   const sliderStep = isSouthAsian ? 10000 : 5000;
 
-  const handleInputChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) {
-      setInputValue(val);
-      if (val === '') {
-        onChange('');
-      } else {
-        const parsed = parseInt(val, 10);
-        onChange(isNaN(parsed) ? '' : parsed);
-      }
-    }
-  };
-
-  const handleBlur = () => {
-    if (inputValue === '') {
-      return;
-    }
-    const parsed = parseInt(inputValue, 10);
-    if (!isNaN(parsed)) {
-      setInputValue(parsed.toString());
-      onChange(parsed);
-    }
-  };
-
   const handleSliderChange = (e) => {
     const val = parseInt(e.target.value, 10);
-    setInputValue(val.toString());
     onChange(val);
   };
 
   const handleQuickAmount = (val) => {
-    setInputValue(val.toString());
     onChange(val);
   };
 
@@ -85,14 +51,12 @@ export default function LoanAmountInput({
       
       <div className="input-wrapper">
         <span className="input-prefix">{currency}</span>
-        <input
+        <NumericInput
           id="loan-amount-input"
-          type="text"
           className={`input-field has-prefix ${error ? 'input-error' : ''}`}
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          inputMode="numeric"
+          value={value}
+          onChange={onChange}
+          isDecimal={false}
           placeholder="e.g. 1000000"
           aria-invalid={!!error}
           aria-describedby={error ? 'loan-amount-error' : undefined}

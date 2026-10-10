@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import NumericInput from './NumericInput';
 
 export default function SavingsAdvancedOptions({
   contributionTiming,
@@ -118,15 +119,16 @@ export default function SavingsAdvancedOptions({
                 <span className="text-xs text-secondary">Step-up percentage each year</span>
               </div>
               <div className="input-wrapper">
-                <input
+                <NumericInput
                   id="annual-increase-input"
-                  type="number"
-                  min="0"
-                  max="50"
-                  step="0.5"
                   className="input-field has-suffix"
                   value={annualContributionIncrease || ''}
-                  onChange={(e) => onAnnualContributionIncreaseChange(parseFloat(e.target.value) || 0)}
+                  onChange={(val) => onAnnualContributionIncreaseChange(val === '' ? 0 : val)}
+                  isDecimal={true}
+                  min={0}
+                  max={50}
+                  fallbackOnBlur={true}
+                  fallbackValue={0}
                   placeholder="0"
                 />
                 <span className="input-suffix">% / yr</span>
@@ -156,13 +158,15 @@ export default function SavingsAdvancedOptions({
                     <label className="input-label" htmlFor="one-time-amount-input">Deposit amount</label>
                     <div className="input-wrapper">
                       <span className="input-prefix">{currency}</span>
-                      <input
+                      <NumericInput
                         id="one-time-amount-input"
-                        type="number"
-                        min="0"
                         className="input-field has-prefix"
                         value={oneTimeDepositAmount || ''}
-                        onChange={(e) => onOneTimeDepositAmountChange(Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(val) => onOneTimeDepositAmountChange(val === '' ? 0 : val)}
+                        isDecimal={false}
+                        min={0}
+                        fallbackOnBlur={true}
+                        fallbackValue={0}
                         placeholder="e.g. 50000"
                       />
                     </div>
@@ -171,14 +175,16 @@ export default function SavingsAdvancedOptions({
                   <div className="input-group" style={{ marginBottom: 0 }}>
                     <label className="input-label" htmlFor="one-time-period-input">Deposit at month</label>
                     <div className="input-wrapper">
-                      <input
+                      <NumericInput
                         id="one-time-period-input"
-                        type="number"
-                        min="1"
-                        max="600"
                         className="input-field has-suffix"
                         value={oneTimeDepositPeriod || ''}
-                        onChange={(e) => onOneTimeDepositPeriodChange(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                        onChange={(val) => onOneTimeDepositPeriodChange(val === '' ? 1 : Math.max(1, val))}
+                        isDecimal={false}
+                        min={1}
+                        max={600}
+                        fallbackOnBlur={true}
+                        fallbackValue={24}
                         placeholder="24"
                       />
                       <span className="input-suffix">Mo</span>
@@ -207,15 +213,16 @@ export default function SavingsAdvancedOptions({
               {inflationEnabled && (
                 <div style={{ marginTop: '12px' }}>
                   <div className="input-wrapper">
-                    <input
+                    <NumericInput
                       id="inflation-rate-input"
-                      type="number"
-                      min="0"
-                      max="30"
-                      step="0.5"
                       className="input-field has-suffix"
                       value={inflationRate}
-                      onChange={(e) => onInflationRateChange(parseFloat(e.target.value) || 0)}
+                      onChange={(val) => onInflationRateChange(val === '' ? 0 : val)}
+                      isDecimal={true}
+                      min={0}
+                      max={30}
+                      fallbackOnBlur={true}
+                      fallbackValue={3}
                       placeholder="3"
                     />
                     <span className="input-suffix">% / yr</span>
@@ -235,13 +242,15 @@ export default function SavingsAdvancedOptions({
               </div>
               <div className="input-wrapper">
                 <span className="input-prefix">{currency}</span>
-                <input
+                <NumericInput
                   id="annual-fee-input"
-                  type="number"
-                  min="0"
                   className="input-field has-prefix has-suffix"
                   value={annualFee || ''}
-                  onChange={(e) => onAnnualFeeChange(Math.max(0, parseFloat(e.target.value) || 0))}
+                  onChange={(val) => onAnnualFeeChange(val === '' ? 0 : val)}
+                  isDecimal={false}
+                  min={0}
+                  fallbackOnBlur={true}
+                  fallbackValue={0}
                   placeholder="0"
                 />
                 <span className="input-suffix">/ yr</span>
@@ -271,14 +280,13 @@ export default function SavingsAdvancedOptions({
                     <div>
                       <label className="text-xs text-secondary" htmlFor="scenario-low-input">Lower rate</label>
                       <div className="input-wrapper" style={{ marginTop: '4px' }}>
-                        <input
+                        <NumericInput
                           id="scenario-low-input"
-                          type="number"
-                          step="0.5"
-                          min="0"
                           className="input-field has-suffix"
                           value={scenarioLowerRate}
-                          onChange={(e) => onScenarioLowerRateChange(parseFloat(e.target.value) || 0)}
+                          onChange={(val) => onScenarioLowerRateChange(val === '' ? 0 : val)}
+                          isDecimal={true}
+                          min={0}
                           style={{ padding: '8px 10px', fontSize: '0.85rem' }}
                         />
                         <span className="input-suffix">%</span>
@@ -300,14 +308,13 @@ export default function SavingsAdvancedOptions({
                     <div>
                       <label className="text-xs text-secondary" htmlFor="scenario-high-input">Higher rate</label>
                       <div className="input-wrapper" style={{ marginTop: '4px' }}>
-                        <input
+                        <NumericInput
                           id="scenario-high-input"
-                          type="number"
-                          step="0.5"
-                          min="0"
                           className="input-field has-suffix"
                           value={scenarioHigherRate}
-                          onChange={(e) => onScenarioHigherRateChange(parseFloat(e.target.value) || 0)}
+                          onChange={(val) => onScenarioHigherRateChange(val === '' ? 0 : val)}
+                          isDecimal={true}
+                          min={0}
                           style={{ padding: '8px 10px', fontSize: '0.85rem' }}
                         />
                         <span className="input-suffix">%</span>

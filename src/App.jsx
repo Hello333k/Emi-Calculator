@@ -14,12 +14,8 @@ import AdvancedOptions from './components/AdvancedOptions';
 import ResultHero from './components/ResultHero';
 import MetricGrid from './components/MetricGrid';
 import BreakdownChart from './components/BreakdownChart';
-import BalanceChart from './components/BalanceChart';
-import YearlySummary from './components/YearlySummary';
-import AmortizationTable from './components/AmortizationTable';
 import ExtraPaymentSimulator from './components/ExtraPaymentSimulator';
-import EducationSection from './components/EducationSection';
-import FAQ from './components/FAQ';
+import RevealSection from './components/RevealSection';
 import Footer from './components/Footer';
 import ShareDialog from './components/ShareDialog';
 import Toast from './components/Toast';
@@ -56,8 +52,6 @@ function CalculatorApp({ onNavigate, theme, toggleTheme }) {
     totalRepayment,
     processingFeeAmount,
     totalCost,
-    amortizationSchedule,
-    yearlySummary,
     extraPaymentScenario,
     reset: resetCalculator,
     getShareState
@@ -124,17 +118,12 @@ function CalculatorApp({ onNavigate, theme, toggleTheme }) {
 
       <main className="container" id="main-content">
         {/* Hero Section */}
-        <section className="section" style={{ paddingBottom: '24px' }}>
-          <div style={{ maxWidth: '680px' }}>
-            <h1>EMI Calculator</h1>
-            <p className="text-secondary" style={{ fontSize: '1.05rem', lineHeight: 1.6 }}>
-              Estimate your monthly loan payment, total interest, and complete repayment schedule in seconds. Zero ads, zero tracking, calculated instantly in your browser.
-            </p>
-          </div>
+        <section className="section" style={{ paddingBottom: '16px' }}>
+          <h1>EMI Calculator</h1>
         </section>
 
         {/* Primary Calculator Workspace */}
-        <div className="calculator-shell">
+        <RevealSection className="calculator-shell">
           {/* Left Column: Input Controls */}
           <section className="calculator-inputs" aria-labelledby="loan-details-heading">
             <h2 id="loan-details-heading" style={{ fontSize: '1.25rem', marginBottom: '20px' }}>
@@ -240,47 +229,26 @@ function CalculatorApp({ onNavigate, theme, toggleTheme }) {
               />
             </div>
           </section>
-        </div>
+        </RevealSection>
 
-        {/* Balance Over Time Chart */}
-        <BalanceChart
-          schedule={amortizationSchedule}
-          currency={currency}
-          isValid={isFullyValid && hasLoan}
-        />
 
         {/* Extra Payment Simulation */}
-        <ExtraPaymentSimulator
-          extraMonthly={extraMonthlyPayment}
-          onExtraMonthlyChange={setExtraMonthlyPayment}
-          extraAnnual={extraAnnualPayment}
-          onExtraAnnualChange={setExtraAnnualPayment}
-          extraOneTime={extraOneTimePayment}
-          onExtraOneTimeChange={setExtraOneTimePayment}
-          scenario={extraPaymentScenario}
-          currency={currency}
-          isValid={isFullyValid && hasLoan}
-        />
+        <RevealSection delay={80}>
+          <ExtraPaymentSimulator
+            extraMonthly={extraMonthlyPayment}
+            onExtraMonthlyChange={setExtraMonthlyPayment}
+            extraAnnual={extraAnnualPayment}
+            onExtraAnnualChange={setExtraAnnualPayment}
+            extraOneTime={extraOneTimePayment}
+            onExtraOneTimeChange={setExtraOneTimePayment}
+            scenario={extraPaymentScenario}
+            currency={currency}
+            isValid={isFullyValid && hasLoan}
+          />
+        </RevealSection>
 
-        {/* Yearly Overview */}
-        <YearlySummary
-          yearlySummary={yearlySummary}
-          currency={currency}
-          isValid={isFullyValid && hasLoan}
-        />
 
-        {/* Full Amortization Schedule */}
-        <AmortizationTable
-          schedule={amortizationSchedule}
-          currency={currency}
-          isValid={isFullyValid && hasLoan}
-        />
 
-        {/* Educational Content */}
-        <EducationSection />
-
-        {/* FAQ Section */}
-        <FAQ />
       </main>
 
       <Footer onNavigate={onNavigate} currentRoute="emi" />

@@ -1,4 +1,5 @@
 import React from 'react';
+import NumericInput from './NumericInput';
 
 const quickStartSouthAsian = [
   { label: '0', value: 0 },
@@ -65,34 +66,6 @@ export default function SavingsInputs({
   const startPills = isSouthAsian ? quickStartSouthAsian : quickStartStandard;
   const contribPills = isSouthAsian ? quickContribSouthAsian : quickContribStandard;
 
-  const handleStartNum = (val) => {
-    if (val === '') {
-      onStartingBalanceChange('');
-    } else {
-      const p = parseInt(val, 10);
-      onStartingBalanceChange(isNaN(p) ? 0 : Math.max(0, p));
-    }
-  };
-
-  const handleContribNum = (val) => {
-    if (val === '') {
-      onContributionAmountChange('');
-    } else {
-      const p = parseInt(val, 10);
-      onContributionAmountChange(isNaN(p) ? 0 : Math.max(0, p));
-    }
-  };
-
-  const handleRateChange = (e) => {
-    const val = e.target.value;
-    if (val === '') {
-      onAnnualRateChange('');
-    } else {
-      const p = parseFloat(val);
-      onAnnualRateChange(isNaN(p) ? 0 : p);
-    }
-  };
-
   return (
     <div>
       {/* ─── Starting Balance ─── */}
@@ -104,15 +77,13 @@ export default function SavingsInputs({
 
         <div className="input-wrapper">
           <span className="input-prefix">{currency}</span>
-          <input
+          <NumericInput
             id="starting-balance-input"
-            type="text"
             className={`input-field has-prefix ${errors.startingBalance ? 'input-error' : ''}`}
             value={startingBalance}
-            onChange={(e) => {
-              if (/^\d*$/.test(e.target.value)) handleStartNum(e.target.value);
-            }}
-            inputMode="numeric"
+            onChange={onStartingBalanceChange}
+            isDecimal={false}
+            min={0}
             placeholder="0"
             aria-invalid={!!errors.startingBalance}
             aria-describedby={errors.startingBalance ? 'starting-balance-error' : undefined}
@@ -164,15 +135,13 @@ export default function SavingsInputs({
 
         <div className="input-wrapper">
           <span className="input-prefix">{currency}</span>
-          <input
+          <NumericInput
             id="contribution-amount-input"
-            type="text"
             className={`input-field has-prefix ${errors.contributionAmount ? 'input-error' : ''}`}
             value={contributionAmount}
-            onChange={(e) => {
-              if (/^\d*$/.test(e.target.value)) handleContribNum(e.target.value);
-            }}
-            inputMode="numeric"
+            onChange={onContributionAmountChange}
+            isDecimal={false}
+            min={0}
             placeholder="0"
             aria-invalid={!!errors.contributionAmount}
             aria-describedby={errors.contributionAmount ? 'contribution-amount-error' : undefined}
@@ -228,15 +197,14 @@ export default function SavingsInputs({
         </div>
 
         <div className="input-wrapper">
-          <input
+          <NumericInput
             id="annual-rate-input"
-            type="number"
-            step="0.1"
-            min="0"
-            max="100"
             className={`input-field has-suffix ${errors.annualRate ? 'input-error' : ''}`}
             value={annualRate}
-            onChange={handleRateChange}
+            onChange={onAnnualRateChange}
+            isDecimal={true}
+            min={0}
+            max={100}
             placeholder="8"
             aria-invalid={!!errors.annualRate}
             aria-describedby={errors.annualRate ? 'annual-rate-error' : undefined}
@@ -295,14 +263,14 @@ export default function SavingsInputs({
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
           <div className="input-wrapper">
-            <input
+            <NumericInput
               id="time-years-input"
-              type="number"
-              min="0"
-              max="50"
               className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
               value={timeYears}
-              onChange={(e) => onTimeYearsChange(Math.max(0, parseInt(e.target.value, 10) || 0))}
+              onChange={onTimeYearsChange}
+              isDecimal={false}
+              min={0}
+              max={50}
               placeholder="5"
               aria-label="Years"
             />
@@ -310,14 +278,14 @@ export default function SavingsInputs({
           </div>
 
           <div className="input-wrapper">
-            <input
+            <NumericInput
               id="time-months-input"
-              type="number"
-              min="0"
-              max="11"
               className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
               value={timeMonths}
-              onChange={(e) => onTimeMonthsChange(Math.min(11, Math.max(0, parseInt(e.target.value, 10) || 0)))}
+              onChange={onTimeMonthsChange}
+              isDecimal={false}
+              min={0}
+              max={11}
               placeholder="0"
               aria-label="Months"
             />
@@ -332,9 +300,9 @@ export default function SavingsInputs({
         <div className="slider-container">
           <input
             type="range"
-            min="1"
-            max="50"
-            step="1"
+            min={1}
+            max={50}
+            step={1}
             value={Math.min(Math.max(Number(timeYears) || 1, 1), 50)}
             onChange={(e) => onTimeYearsChange(parseInt(e.target.value, 10))}
             aria-label="Time horizon years slider"

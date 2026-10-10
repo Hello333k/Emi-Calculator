@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import NumericInput from './NumericInput';
 
 const tenurePresets = [
   { label: '1 Yr', years: 1, months: 0 },
@@ -16,78 +17,17 @@ export default function LoanTermInput({
   onMonthsChange,
   error
 }) {
-  const [yearsInput, setYearsInput] = useState(years !== '' && years !== null && years !== undefined ? years.toString() : '');
-  const [prevYears, setPrevYears] = useState(years);
-
-  const [monthsInput, setMonthsInput] = useState(months !== '' && months !== null && months !== undefined ? months.toString() : '');
-  const [prevMonths, setPrevMonths] = useState(months);
-
-  // Sync state during render when props change externally
-  if (years !== prevYears) {
-    setPrevYears(years);
-    setYearsInput(years !== '' && years !== null && years !== undefined ? years.toString() : '');
-  }
-
-  if (months !== prevMonths) {
-    setPrevMonths(months);
-    setMonthsInput(months !== '' && months !== null && months !== undefined ? months.toString() : '');
-  }
-
   const totalMonths = (parseInt(years, 10) || 0) * 12 + (parseInt(months, 10) || 0);
-
-  const handleYearsChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) {
-      setYearsInput(val);
-      if (val === '') {
-        onYearsChange(0);
-      } else {
-        const parsed = parseInt(val, 10);
-        onYearsChange(isNaN(parsed) ? 0 : parsed);
-      }
-    }
-  };
-
-  const handleMonthsChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) {
-      setMonthsInput(val);
-      if (val === '') {
-        onMonthsChange(0);
-      } else {
-        const parsed = parseInt(val, 10);
-        onMonthsChange(isNaN(parsed) ? 0 : parsed);
-      }
-    }
-  };
-
-  const handleYearsBlur = () => {
-    const parsed = parseInt(yearsInput, 10);
-    const safeYears = isNaN(parsed) ? 0 : Math.min(Math.max(parsed, 0), 40);
-    setYearsInput(safeYears.toString());
-    onYearsChange(safeYears);
-  };
-
-  const handleMonthsBlur = () => {
-    const parsed = parseInt(monthsInput, 10);
-    const safeMonths = isNaN(parsed) ? 0 : Math.min(Math.max(parsed, 0), 11);
-    setMonthsInput(safeMonths.toString());
-    onMonthsChange(safeMonths);
-  };
 
   const handleSliderChange = (e) => {
     const total = parseInt(e.target.value, 10);
     const newYears = Math.floor(total / 12);
     const newMonths = total % 12;
-    setYearsInput(newYears.toString());
-    setMonthsInput(newMonths.toString());
     onYearsChange(newYears);
     onMonthsChange(newMonths);
   };
 
   const handlePreset = (preset) => {
-    setYearsInput(preset.years.toString());
-    setMonthsInput(preset.months.toString());
     onYearsChange(preset.years);
     onMonthsChange(preset.months);
   };
@@ -103,28 +43,28 @@ export default function LoanTermInput({
 
       <div className="term-inputs">
         <div className="input-wrapper">
-          <input
+          <NumericInput
             id="tenure-years-input"
-            type="text"
             className={`input-field has-suffix ${error ? 'input-error' : ''}`}
-            value={yearsInput}
-            onChange={handleYearsChange}
-            onBlur={handleYearsBlur}
-            inputMode="numeric"
+            value={years}
+            onChange={onYearsChange}
+            isDecimal={false}
+            min={0}
+            max={40}
             placeholder="Years"
             aria-label="Tenure in years"
           />
           <span className="input-suffix">yr</span>
         </div>
         <div className="input-wrapper">
-          <input
+          <NumericInput
             id="tenure-months-input"
-            type="text"
             className={`input-field has-suffix ${error ? 'input-error' : ''}`}
-            value={monthsInput}
-            onChange={handleMonthsChange}
-            onBlur={handleMonthsBlur}
-            inputMode="numeric"
+            value={months}
+            onChange={onMonthsChange}
+            isDecimal={false}
+            min={0}
+            max={11}
             placeholder="Months"
             aria-label="Tenure in additional months"
           />

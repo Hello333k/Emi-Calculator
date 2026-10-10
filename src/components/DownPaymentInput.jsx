@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React from 'react';
 import { formatCurrency } from '../utils/formatters';
+import NumericInput from './NumericInput';
 
 export default function DownPaymentInput({
   purchasePrice,
@@ -14,32 +15,6 @@ export default function DownPaymentInput({
   currency = 'NPR',
   error
 }) {
-  const [inputValue, setInputValue] = useState(
-    downPaymentValue !== '' && downPaymentValue !== null && downPaymentValue !== undefined
-      ? downPaymentValue.toString()
-      : '0'
-  );
-  const [prevValue, setPrevValue] = useState(downPaymentValue);
-  const [prevMode, setPrevMode] = useState(downPaymentMode);
-
-  if (downPaymentValue !== prevValue) {
-    setPrevValue(downPaymentValue);
-    setInputValue(
-      downPaymentValue !== '' && downPaymentValue !== null && downPaymentValue !== undefined
-        ? downPaymentValue.toString()
-        : '0'
-    );
-  }
-
-  if (downPaymentMode !== prevMode) {
-    setPrevMode(downPaymentMode);
-    setInputValue(
-      downPaymentValue !== '' && downPaymentValue !== null && downPaymentValue !== undefined
-        ? downPaymentValue.toString()
-        : '0'
-    );
-  }
-
   const numPrice = Number(purchasePrice);
   const validPrice = isFinite(numPrice) && numPrice > 0 ? numPrice : 0;
   const isPercentage = downPaymentMode === 'percentage';
@@ -47,39 +22,8 @@ export default function DownPaymentInput({
   const sliderMax = isPercentage ? 100 : validPrice;
   const sliderStep = isPercentage ? 1 : (currency === 'NPR' || currency === 'INR' ? 10000 : 5000);
 
-  const handleInputChange = (e) => {
-    const val = e.target.value;
-    if (isPercentage) {
-      if (/^\d*\.?\d*$/.test(val)) {
-        setInputValue(val);
-        const parsed = parseFloat(val);
-        onDownPaymentValueChange(isNaN(parsed) ? 0 : parsed);
-      }
-    } else {
-      if (/^\d*$/.test(val)) {
-        setInputValue(val);
-        const parsed = parseInt(val, 10);
-        onDownPaymentValueChange(isNaN(parsed) ? 0 : parsed);
-      }
-    }
-  };
-
-  const handleBlur = () => {
-    if (inputValue === '' || inputValue === '.') {
-      setInputValue('0');
-      onDownPaymentValueChange(0);
-      return;
-    }
-    const parsed = isPercentage ? parseFloat(inputValue) : parseInt(inputValue, 10);
-    if (!isNaN(parsed)) {
-      setInputValue(parsed.toString());
-      onDownPaymentValueChange(parsed);
-    }
-  };
-
   const handleSliderChange = (e) => {
     const val = isPercentage ? parseFloat(e.target.value) : parseInt(e.target.value, 10);
-    setInputValue(val.toString());
     onDownPaymentValueChange(val);
   };
 
@@ -87,14 +31,10 @@ export default function DownPaymentInput({
     if (newMode === downPaymentMode) return;
     onDownPaymentModeChange(newMode);
     onDownPaymentValueChange(0);
-    setInputValue('0');
   };
 
-  const sliderVal = (() => {
-    const v = isPercentage ? parseFloat(inputValue) : parseInt(inputValue, 10);
-    if (isNaN(v)) return 0;
-    return Math.min(Math.max(v, 0), sliderMax || 1);
-  })();
+  const currentNum = Number(downPaymentValue);
+  const sliderVal = isNaN(currentNum) ? 0 : Math.min(Math.max(currentNum, 0), sliderMax || 1);
 
   const dpPct = validPrice > 0 ? (downPaymentAmount / validPrice) * 100 : 0;
   const financedPct = 100 - dpPct;
@@ -123,14 +63,17 @@ export default function DownPaymentInput({
 
       <div className="input-wrapper">
         {!isPercentage && <span className="input-prefix">{currency}</span>}
-        <input
+        <NumericInput
+          key={downPaymentMode}
           id="down-payment-input"
-          type="text"
           className={`input-field ${!isPercentage ? 'has-prefix' : ''} ${isPercentage ? 'has-suffix' : ''} ${error ? 'input-error' : ''}`}
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          inputMode={isPercentage ? 'decimal' : 'numeric'}
+          value={downPaymentValue}
+          onChange={onDownPaymentValueChange}
+          isDecimal={isPercentage}
+          min={0}
+          max={isPercentage ? 100 : undefined}
+          fallbackOnBlur={true}
+          fallbackValue={0}
           placeholder={isPercentage ? 'e.g. 20' : 'e.g. 200000'}
           aria-invalid={!!error}
           aria-describedby={error ? 'down-payment-error' : 'down-payment-info'}

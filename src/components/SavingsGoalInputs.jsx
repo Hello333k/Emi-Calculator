@@ -1,4 +1,5 @@
 import React from 'react';
+import NumericInput from './NumericInput';
 
 const quickTargetsSouthAsian = [
   { label: '10 Lakhs', value: 1000000 },
@@ -41,33 +42,6 @@ export default function SavingsGoalInputs({
   const isSouthAsian = currency === 'NPR' || currency === 'INR';
   const targetPills = isSouthAsian ? quickTargetsSouthAsian : quickTargetsStandard;
 
-  const handleTargetNum = (val) => {
-    if (val === '') {
-      onTargetAmountChange('');
-    } else {
-      const p = parseInt(val, 10);
-      onTargetAmountChange(isNaN(p) ? 0 : Math.max(0, p));
-    }
-  };
-
-  const handleCurrentSavingsNum = (val) => {
-    if (val === '') {
-      onCurrentSavingsChange('');
-    } else {
-      const p = parseInt(val, 10);
-      onCurrentSavingsChange(isNaN(p) ? 0 : Math.max(0, p));
-    }
-  };
-
-  const handleGoalContribNum = (val) => {
-    if (val === '') {
-      onGoalContributionChange('');
-    } else {
-      const p = parseInt(val, 10);
-      onGoalContributionChange(isNaN(p) ? 0 : Math.max(0, p));
-    }
-  };
-
   return (
     <div>
       {/* ─── Goal Sub-Mode Toggle ─── */}
@@ -102,15 +76,13 @@ export default function SavingsGoalInputs({
 
         <div className="input-wrapper">
           <span className="input-prefix">{currency}</span>
-          <input
+          <NumericInput
             id="goal-target-amount-input"
-            type="text"
             className={`input-field has-prefix ${errors.targetAmount ? 'input-error' : ''}`}
             value={targetAmount}
-            onChange={(e) => {
-              if (/^\d*$/.test(e.target.value)) handleTargetNum(e.target.value);
-            }}
-            inputMode="numeric"
+            onChange={onTargetAmountChange}
+            isDecimal={false}
+            min={0}
             placeholder="e.g. 5000000"
             aria-invalid={!!errors.targetAmount}
             aria-describedby={errors.targetAmount ? 'goal-target-error' : undefined}
@@ -144,15 +116,13 @@ export default function SavingsGoalInputs({
 
         <div className="input-wrapper">
           <span className="input-prefix">{currency}</span>
-          <input
+          <NumericInput
             id="goal-current-savings-input"
-            type="text"
             className={`input-field has-prefix ${errors.currentSavings ? 'input-error' : ''}`}
             value={currentSavings}
-            onChange={(e) => {
-              if (/^\d*$/.test(e.target.value)) handleCurrentSavingsNum(e.target.value);
-            }}
-            inputMode="numeric"
+            onChange={onCurrentSavingsChange}
+            isDecimal={false}
+            min={0}
             placeholder="0"
           />
         </div>
@@ -185,15 +155,13 @@ export default function SavingsGoalInputs({
 
           <div className="input-wrapper">
             <span className="input-prefix">{currency}</span>
-            <input
+            <NumericInput
               id="goal-contribution-input"
-              type="text"
               className="input-field has-prefix"
               value={goalContribution}
-              onChange={(e) => {
-                if (/^\d*$/.test(e.target.value)) handleGoalContribNum(e.target.value);
-              }}
-              inputMode="numeric"
+              onChange={onGoalContributionChange}
+              isDecimal={false}
+              min={0}
               placeholder="e.g. 10000"
             />
             <span className="input-suffix">/{contributionFrequency === 'yearly' ? 'yr' : 'mo'}</span>
@@ -226,14 +194,14 @@ export default function SavingsGoalInputs({
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div className="input-wrapper">
-              <input
+              <NumericInput
                 id="goal-time-years-input"
-                type="number"
-                min="0"
-                max="50"
                 className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
                 value={timeYears}
-                onChange={(e) => onTimeYearsChange(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                onChange={onTimeYearsChange}
+                isDecimal={false}
+                min={0}
+                max={50}
                 placeholder="5"
                 aria-label="Target years"
               />
@@ -241,14 +209,14 @@ export default function SavingsGoalInputs({
             </div>
 
             <div className="input-wrapper">
-              <input
+              <NumericInput
                 id="goal-time-months-input"
-                type="number"
-                min="0"
-                max="11"
                 className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
                 value={timeMonths}
-                onChange={(e) => onTimeMonthsChange(Math.min(11, Math.max(0, parseInt(e.target.value, 10) || 0)))}
+                onChange={onTimeMonthsChange}
+                isDecimal={false}
+                min={0}
+                max={11}
                 placeholder="0"
                 aria-label="Target months"
               />
@@ -286,18 +254,14 @@ export default function SavingsGoalInputs({
         </div>
 
         <div className="input-wrapper">
-          <input
+          <NumericInput
             id="goal-annual-rate-input"
-            type="number"
-            step="0.1"
-            min="0"
-            max="100"
             className={`input-field has-suffix ${errors.annualRate ? 'input-error' : ''}`}
             value={annualRate}
-            onChange={(e) => {
-              const val = e.target.value;
-              onAnnualRateChange(val === '' ? '' : parseFloat(val) || 0);
-            }}
+            onChange={onAnnualRateChange}
+            isDecimal={true}
+            min={0}
+            max={100}
             placeholder="8"
           />
           <span className="input-suffix">%</span>

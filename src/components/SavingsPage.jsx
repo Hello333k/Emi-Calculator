@@ -9,14 +9,10 @@ import SavingsGoalInputs from './SavingsGoalInputs';
 import SavingsAdvancedOptions from './SavingsAdvancedOptions';
 import SavingsResultHero from './SavingsResultHero';
 import SavingsMetricGrid from './SavingsMetricGrid';
-import SavingsGrowthChart from './SavingsGrowthChart';
-import SavingsMilestones from './SavingsMilestones';
 import SavingsScenarioTable from './SavingsScenarioTable';
-import SavingsSchedule from './SavingsSchedule';
-import SavingsEducation from './SavingsEducation';
-import SavingsFAQ from './SavingsFAQ';
 import ShareDialog from './ShareDialog';
 import Toast from './Toast';
+import RevealSection from './RevealSection';
 
 export default function SavingsPage() {
   const {
@@ -48,8 +44,6 @@ export default function SavingsPage() {
     scenarioEnabled, setScenarioEnabled,
     scenarioLowerRate, setScenarioLowerRate,
     scenarioHigherRate, setScenarioHigherRate,
-    // View
-    scheduleView, setScheduleView,
     // Currency
     currency,
     // Derived
@@ -125,9 +119,6 @@ export default function SavingsPage() {
   };
 
   const summary = activeProjection?.summary;
-  const schedule = activeProjection?.schedule || [];
-  const yearlySummary = activeProjection?.yearlySummary || [];
-  const milestones = activeProjection?.milestones || [];
 
   return (
     <main className="container" id="main-content">
@@ -144,10 +135,7 @@ export default function SavingsPage() {
           }}>
             Financial planning tool
           </div>
-          <h1 style={{ margin: '0 0 12px 0' }}>Savings Calculator</h1>
-          <p className="text-secondary" style={{ fontSize: '1.05rem', lineHeight: 1.6, margin: 0 }}>
-            See how your savings could grow over time with regular contributions, compound growth, and strategic goal planning.
-          </p>
+          <h1 style={{ margin: 0 }}>Savings Calculator</h1>
         </div>
 
         {/* Mode Selector Tabs */}
@@ -178,7 +166,7 @@ export default function SavingsPage() {
       </section>
 
       {/* Primary Calculator Workspace */}
-      <div className="calculator-shell">
+      <RevealSection className="calculator-shell">
         {/* Left Column: Inputs */}
         <section className="calculator-inputs" aria-labelledby="savings-parameters-heading">
           <h2 id="savings-parameters-heading" style={{ fontSize: '1.25rem', marginBottom: '20px' }}>
@@ -327,55 +315,20 @@ export default function SavingsPage() {
             rateType={rateType}
           />
         </section>
-      </div>
-
-      {/* SVG Growth Chart */}
-      <SavingsGrowthChart
-        schedule={schedule}
-        summary={summary}
-        currency={currency}
-        isValid={isValid}
-        scenarios={scenarios}
-      />
-
-      {/* Milestones */}
-      <SavingsMilestones
-        milestones={milestones}
-        currency={currency}
-        isValid={isValid}
-      />
+      </RevealSection>
 
       {/* Rate Scenario Comparison (if enabled) */}
       {scenarioEnabled && (
-        <SavingsScenarioTable
-          scenarios={scenarios}
-          baseRate={annualRate}
-          currency={currency}
-          isValid={isValid}
-        />
+        <RevealSection delay={80}>
+          <SavingsScenarioTable
+            scenarios={scenarios}
+            baseRate={annualRate}
+            currency={currency}
+            isValid={isValid}
+          />
+        </RevealSection>
       )}
 
-      {/* Itemized Schedule (Yearly Summary & Monthly Detail) with CSV Download */}
-      <SavingsSchedule
-        schedule={schedule}
-        yearlySummary={yearlySummary}
-        summary={summary}
-        currency={currency}
-        isValid={isValid}
-        view={scheduleView}
-        onViewChange={setScheduleView}
-      />
-
-      {/* Educational Content */}
-      <SavingsEducation />
-
-      {/* FAQ Section */}
-      <SavingsFAQ />
-
-      {/* Financial Disclaimer */}
-      <div style={{ marginTop: '40px', padding: '16px 20px', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', fontSize: '0.78rem', color: 'var(--text-tertiary)', lineHeight: 1.6 }}>
-        <strong>Financial Estimate Disclaimer:</strong> These results are mathematical projections based on the assumptions entered. Actual savings performance may vary because interest rates, compounding policies, account fees, taxes, contribution timing, and deposit terms can fluctuate over time. This tool does not constitute personalized financial or investment advice.
-      </div>
 
       {/* Share Calculation Modal */}
       <ShareDialog

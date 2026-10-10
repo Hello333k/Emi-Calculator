@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import NumericInput from './NumericInput';
 
 export default function AdvancedOptions({
   processingFeeEnabled,
@@ -10,36 +11,6 @@ export default function AdvancedOptions({
   currency
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [localValue, setLocalValue] = useState(processingFeeValue.toString());
-  const [prevValue, setPrevValue] = useState(processingFeeValue);
-
-  if (processingFeeValue !== prevValue) {
-    setPrevValue(processingFeeValue);
-    setLocalValue(processingFeeValue.toString());
-  }
-
-  const handleBlur = () => {
-    const parsed = parseFloat(localValue);
-    if (!isNaN(parsed) && parsed >= 0) {
-      onProcessingFeeValueChange(parsed);
-      setLocalValue(parsed.toString());
-    } else {
-      setLocalValue(processingFeeValue.toString());
-    }
-  };
-
-  const handleChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*\.?\d*$/.test(val)) {
-      setLocalValue(val);
-      if (val !== '' && val !== '.') {
-        const parsed = parseFloat(val);
-        if (!isNaN(parsed) && parsed >= 0) {
-          onProcessingFeeValueChange(parsed);
-        }
-      }
-    }
-  };
 
   return (
     <div className="accordion" style={{ marginTop: '20px' }}>
@@ -119,13 +90,14 @@ export default function AdvancedOptions({
                   </label>
                   <div className="input-wrapper">
                     {processingFeeType === 'fixed' && <span className="input-prefix">{currency}</span>}
-                    <input 
+                    <NumericInput 
+                      key={processingFeeType}
                       id="fee-value-input"
-                      type="text" 
-                      inputMode="decimal"
-                      value={localValue} 
-                      onChange={handleChange} 
-                      onBlur={handleBlur}
+                      value={processingFeeValue} 
+                      onChange={(val) => onProcessingFeeValueChange(val === '' ? 0 : val)}
+                      isDecimal={processingFeeType === 'percentage'}
+                      fallbackOnBlur={true}
+                      fallbackValue={0}
                       className={`input-field ${processingFeeType === 'fixed' ? 'has-prefix' : 'has-suffix'}`}
                       placeholder={processingFeeType === 'percentage' ? '1.0' : '10000'}
                     />

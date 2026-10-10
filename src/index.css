@@ -192,7 +192,7 @@ h3 {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
 .input-field:focus {
@@ -314,10 +314,12 @@ input[type='range']:focus-visible {
 .quick-amount-btn:hover {
   border-color: var(--accent-primary);
   color: var(--accent-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .quick-amount-btn:active {
-  transform: scale(0.96);
+  transform: translateY(0) scale(0.96);
 }
 
 /* Term Control */
@@ -335,6 +337,11 @@ input[type='range']:focus-visible {
   padding: 32px;
   text-align: center;
   box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.result-hero:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .result-label {
@@ -352,6 +359,7 @@ input[type='range']:focus-visible {
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
+  transition: color var(--transition-fast);
 }
 
 .result-currency {
@@ -373,6 +381,13 @@ input[type='range']:focus-visible {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-color-strong);
 }
 
 .metric-card-label {
@@ -595,8 +610,12 @@ input[type='range']:focus-visible {
   transition: all var(--transition-fast);
 }
 
+.btn:hover {
+  transform: translateY(-1px);
+}
+
 .btn:active {
-  transform: scale(0.97);
+  transform: translateY(0) scale(0.97);
 }
 
 .btn-primary {
@@ -606,6 +625,11 @@ input[type='range']:focus-visible {
 
 .btn-primary:hover {
   background-color: var(--accent-primary-hover);
+  box-shadow: 0 4px 12px rgba(197, 107, 69, 0.25);
+}
+
+[data-theme='dark'] .btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(212, 129, 94, 0.3);
 }
 
 .btn-secondary {
@@ -616,6 +640,7 @@ input[type='range']:focus-visible {
 
 .btn-secondary:hover {
   border-color: var(--border-color-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-ghost {
@@ -945,10 +970,18 @@ input[type='range']:focus-visible {
   transition: all var(--transition-fast);
 }
 
+.segment-btn:not(.active):hover {
+  color: var(--text-primary);
+}
+
 .segment-btn.active {
   background-color: var(--bg-surface);
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
+}
+
+.segment-btn:active {
+  transform: scale(0.98);
 }
 
 /* Tooltip */

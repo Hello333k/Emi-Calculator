@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { formatCurrency } from '../utils/formatters';
+import NumericInput from './NumericInput';
 
 export default function ExtraPaymentSimulator({
   extraMonthly,
@@ -13,55 +14,6 @@ export default function ExtraPaymentSimulator({
   isValid
 }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const [localMonthly, setLocalMonthly] = useState(extraMonthly > 0 ? extraMonthly.toString() : '');
-  const [prevMonthly, setPrevMonthly] = useState(extraMonthly);
-
-  const [localAnnual, setLocalAnnual] = useState(extraAnnual > 0 ? extraAnnual.toString() : '');
-  const [prevAnnual, setPrevAnnual] = useState(extraAnnual);
-
-  const [localOneTime, setLocalOneTime] = useState(extraOneTime > 0 ? extraOneTime.toString() : '');
-  const [prevOneTime, setPrevOneTime] = useState(extraOneTime);
-
-  // Sync state during render when props change externally (e.g. reset)
-  if (extraMonthly !== prevMonthly) {
-    setPrevMonthly(extraMonthly);
-    setLocalMonthly(extraMonthly > 0 ? extraMonthly.toString() : '');
-  }
-
-  if (extraAnnual !== prevAnnual) {
-    setPrevAnnual(extraAnnual);
-    setLocalAnnual(extraAnnual > 0 ? extraAnnual.toString() : '');
-  }
-
-  if (extraOneTime !== prevOneTime) {
-    setPrevOneTime(extraOneTime);
-    setLocalOneTime(extraOneTime > 0 ? extraOneTime.toString() : '');
-  }
-
-  const handleMonthlyChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) {
-      setLocalMonthly(val);
-      onExtraMonthlyChange(val === '' ? 0 : parseInt(val, 10) || 0);
-    }
-  };
-
-  const handleAnnualChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) {
-      setLocalAnnual(val);
-      onExtraAnnualChange(val === '' ? 0 : parseInt(val, 10) || 0);
-    }
-  };
-
-  const handleOneTimeChange = (e) => {
-    const val = e.target.value;
-    if (/^\d*$/.test(val)) {
-      setLocalOneTime(val);
-      onExtraOneTimeChange(val === '' ? 0 : parseInt(val, 10) || 0);
-    }
-  };
 
   if (!isValid) return null;
 
@@ -111,14 +63,16 @@ export default function ExtraPaymentSimulator({
                   <label className="input-label" htmlFor="extra-monthly">Extra monthly payment</label>
                   <div className="input-wrapper">
                     <span className="input-prefix">{currency}</span>
-                    <input 
+                    <NumericInput 
                       id="extra-monthly"
-                      type="text" 
-                      inputMode="numeric"
                       className="input-field has-prefix"
                       placeholder="0"
-                      value={localMonthly}
-                      onChange={handleMonthlyChange}
+                      value={extraMonthly > 0 ? extraMonthly : ''}
+                      onChange={(val) => onExtraMonthlyChange(val === '' ? 0 : val)}
+                      fallbackOnBlur={true}
+                      fallbackValue={0}
+                      isDecimal={false}
+                      min={0}
                     />
                   </div>
                   <span className="input-helper">Added to each monthly EMI</span>
@@ -128,14 +82,16 @@ export default function ExtraPaymentSimulator({
                   <label className="input-label" htmlFor="extra-annual">Extra annual payment</label>
                   <div className="input-wrapper">
                     <span className="input-prefix">{currency}</span>
-                    <input 
+                    <NumericInput 
                       id="extra-annual"
-                      type="text" 
-                      inputMode="numeric"
                       className="input-field has-prefix"
                       placeholder="0"
-                      value={localAnnual}
-                      onChange={handleAnnualChange}
+                      value={extraAnnual > 0 ? extraAnnual : ''}
+                      onChange={(val) => onExtraAnnualChange(val === '' ? 0 : val)}
+                      fallbackOnBlur={true}
+                      fallbackValue={0}
+                      isDecimal={false}
+                      min={0}
                     />
                   </div>
                   <span className="input-helper">Paid once every 12 months</span>
@@ -145,14 +101,16 @@ export default function ExtraPaymentSimulator({
                   <label className="input-label" htmlFor="extra-onetime">One-time extra payment</label>
                   <div className="input-wrapper">
                     <span className="input-prefix">{currency}</span>
-                    <input 
+                    <NumericInput 
                       id="extra-onetime"
-                      type="text" 
-                      inputMode="numeric"
                       className="input-field has-prefix"
                       placeholder="0"
-                      value={localOneTime}
-                      onChange={handleOneTimeChange}
+                      value={extraOneTime > 0 ? extraOneTime : ''}
+                      onChange={(val) => onExtraOneTimeChange(val === '' ? 0 : val)}
+                      fallbackOnBlur={true}
+                      fallbackValue={0}
+                      isDecimal={false}
+                      min={0}
                     />
                   </div>
                   <span className="input-helper">Lump sum in month 1</span>
@@ -170,48 +128,32 @@ export default function ExtraPaymentSimulator({
                         {scenario.monthsSaved} {scenario.monthsSaved === 1 ? 'month' : 'months'}
                       </div>
                       <div className="text-xs text-secondary" style={{ marginTop: '2px' }}>
-                        {Math.floor(scenario.monthsSaved / 12)}y {scenario.monthsSaved % 12}m earlier
+                        New tenure: {scenario.newYears}y {scenario.newMonths}m
                       </div>
                     </div>
 
                     <div style={{ padding: '12px', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
                       <div className="text-xs text-secondary" style={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}>Interest saved</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-success)', marginTop: '4px' }} className="tabular-nums">
+                      <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-success)', marginTop: '4px' }}>
                         {formatCurrency(scenario.interestSaved, currency)}
                       </div>
                       <div className="text-xs text-secondary" style={{ marginTop: '2px' }}>
-                        Reduced interest cost
-                      </div>
-                    </div>
-
-                    <div style={{ padding: '12px', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                      <div className="text-xs text-secondary" style={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}>New total interest</div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 600, marginTop: '4px' }} className="tabular-nums">
-                        {formatCurrency(scenario.totalInterest, currency)}
-                      </div>
-                      <div className="text-xs text-secondary" style={{ marginTop: '2px' }}>
-                        vs. {formatCurrency(scenario.originalTotalInterest, currency)} original
-                      </div>
-                    </div>
-
-                    <div style={{ padding: '12px', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                      <div className="text-xs text-secondary" style={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}>New loan payoff</div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 600, marginTop: '4px' }}>
-                        {scenario.newPayoffMonths} months
-                      </div>
-                      <div className="text-xs text-secondary" style={{ marginTop: '2px' }}>
-                        vs. {scenario.originalPayoffMonths} months original
+                        {scenario.totalInterestBefore > 0 
+                          ? `${((scenario.interestSaved / scenario.totalInterestBefore) * 100).toFixed(1)}% of total interest` 
+                          : '0%'}
                       </div>
                     </div>
                   </div>
 
-                  <div className="disclaimer" style={{ margin: 0, backgroundColor: 'transparent', padding: 0 }}>
-                    Based on the assumptions entered above. Extra payments are assumed to immediately reduce loan principal without prepayment penalty.
+                  <div className="text-xs text-secondary" style={{ lineHeight: 1.5 }}>
+                    Paying extra principal accelerates amortization. Total interest reduced from{' '}
+                    <strong>{formatCurrency(scenario.totalInterestBefore, currency)}</strong> to{' '}
+                    <strong>{formatCurrency(scenario.newTotalInterest, currency)}</strong>.
                   </div>
                 </div>
               ) : (
-                <div style={{ padding: '16px', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Enter any extra payment amount above to see how much interest and time you could save.
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)', textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                  Enter any extra payment amount above to see how much faster you could be debt-free and how much interest you could save.
                 </div>
               )}
             </div>
