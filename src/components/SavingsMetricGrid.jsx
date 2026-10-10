@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatCurrency } from '../utils/formatters';
+import AnimatedNumber from './AnimatedNumber';
 
 export default function SavingsMetricGrid({
   summary,
@@ -164,21 +165,21 @@ export default function SavingsMetricGrid({
         <div className="metric-card">
           <div className="metric-card-label">Starting balance</div>
           <div className="metric-card-value">
-            {formatCurrency(startingBalance, currency)}
+            <AnimatedNumber value={startingBalance} formatter={(val) => formatCurrency(val, currency)} duration={480} />
           </div>
         </div>
 
         <div className="metric-card metric-card--principal">
           <div className="metric-card-label">Total contributed</div>
           <div className="metric-card-value">
-            {formatCurrency(totalContributions, currency)}
+            <AnimatedNumber value={totalContributions} formatter={(val) => formatCurrency(val, currency)} duration={480} />
           </div>
         </div>
 
         <div className="metric-card" style={{ borderLeft: '3px solid var(--color-success)' }}>
           <div className="metric-card-label">Estimated growth</div>
           <div className="metric-card-value" style={{ color: 'var(--color-success)' }}>
-            {formatCurrency(totalInterest, currency)}
+            <AnimatedNumber value={totalInterest} formatter={(val) => formatCurrency(val, currency)} duration={480} />
           </div>
         </div>
 
@@ -191,7 +192,7 @@ export default function SavingsMetricGrid({
 
         <div className="metric-card">
           <div className="metric-card-label">Annual rate</div>
-          <div className="metric-card-value">
+          <div className="metric-card-value tabular-nums">
             {annualRate}% <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'var(--text-secondary)' }}>{rateType === 'apy' ? 'APY' : 'APR'}</span>
           </div>
         </div>
@@ -200,7 +201,7 @@ export default function SavingsMetricGrid({
           <div className="metric-card" style={{ borderLeft: '3px solid var(--color-error)' }}>
             <div className="metric-card-label">Total fees</div>
             <div className="metric-card-value" style={{ color: 'var(--color-error)' }}>
-              {formatCurrency(totalFees, currency)}
+              <AnimatedNumber value={totalFees} formatter={(val) => formatCurrency(val, currency)} duration={480} />
             </div>
           </div>
         )}
@@ -209,7 +210,7 @@ export default function SavingsMetricGrid({
           <div className="metric-card" style={{ borderLeft: '3px solid var(--accent-secondary)' }}>
             <div className="metric-card-label">Today&apos;s money estimate ({inflationRate}% infl.)</div>
             <div className="metric-card-value" style={{ color: 'var(--accent-secondary)' }}>
-              {formatCurrency(inflationAdjustedValue, currency)}
+              <AnimatedNumber value={inflationAdjustedValue} formatter={(val) => formatCurrency(val, currency)} duration={480} />
             </div>
           </div>
         )}

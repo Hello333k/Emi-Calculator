@@ -21,6 +21,7 @@ import ShareDialog from './components/ShareDialog';
 import Toast from './components/Toast';
 import NotFound from './components/NotFound';
 import SavingsPage from './components/SavingsPage';
+import WordReveal from './components/WordReveal';
 
 function CalculatorApp({ onNavigate, theme, toggleTheme }) {
 
@@ -116,16 +117,24 @@ function CalculatorApp({ onNavigate, theme, toggleTheme }) {
         onNavigate={onNavigate}
       />
 
-      <main className="container" id="main-content">
+      <main className="container page-route-enter" id="main-content">
         {/* Hero Section */}
         <section className="section" style={{ paddingBottom: '16px' }}>
-          <h1>EMI Calculator</h1>
+          <h1>
+            <WordReveal text="EMI Calculator" />
+          </h1>
         </section>
 
-        {/* Primary Calculator Workspace */}
-        <RevealSection className="calculator-shell">
-          {/* Left Column: Input Controls */}
-          <section className="calculator-inputs" aria-labelledby="loan-details-heading">
+        {/* Primary Calculator Workspace with Directional Entrances */}
+        <div className="calculator-shell">
+          {/* Left Column: Input Controls gliding in from upper-left */}
+          <RevealSection
+            as="section"
+            direction="left"
+            delay={40}
+            className="calculator-inputs"
+            aria-labelledby="loan-details-heading"
+          >
             <h2 id="loan-details-heading" style={{ fontSize: '1.25rem', marginBottom: '20px' }}>
               Loan details
             </h2>
@@ -174,10 +183,16 @@ function CalculatorApp({ onNavigate, theme, toggleTheme }) {
               onProcessingFeeValueChange={setProcessingFeeValue}
               currency={currency}
             />
-          </section>
+          </RevealSection>
 
-          {/* Right Column: Live Results */}
-          <section className="calculator-results" aria-labelledby="calculation-result-heading">
+          {/* Right Column: Live Results gliding in from upper-right */}
+          <RevealSection
+            as="section"
+            direction="right"
+            delay={90}
+            className="calculator-results"
+            aria-labelledby="calculation-result-heading"
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h2 id="calculation-result-heading" style={{ fontSize: '1.25rem', margin: 0 }}>
                 Your result
@@ -228,8 +243,8 @@ function CalculatorApp({ onNavigate, theme, toggleTheme }) {
                 isValid={isFullyValid && hasLoan}
               />
             </div>
-          </section>
-        </RevealSection>
+          </RevealSection>
+        </div>
 
 
         {/* Extra Payment Simulation */}

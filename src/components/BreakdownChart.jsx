@@ -71,7 +71,7 @@ export default function BreakdownChart({ principal, totalInterest, currency, isV
               strokeDasharray={`${interestDash} ${circumference}`}
               strokeDashoffset={-principalDash}
               transform="rotate(-90 100 100)"
-              style={{ transition: 'stroke-dasharray var(--transition-normal)' }}
+              style={{ transition: 'stroke-dasharray var(--transition-normal), stroke-dashoffset var(--transition-normal)' }}
             />
           )}
 

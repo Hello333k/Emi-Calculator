@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useSavingsCalculator } from '../hooks/useSavingsCalculator';
 import { useToast } from '../hooks/useToast';
 import { generateSavingsShareUrl, copyToClipboard } from '../utils/shareState';
@@ -13,6 +13,8 @@ import SavingsScenarioTable from './SavingsScenarioTable';
 import ShareDialog from './ShareDialog';
 import Toast from './Toast';
 import RevealSection from './RevealSection';
+import WordReveal from './WordReveal';
+import AnimatedSegmentedControl from './AnimatedSegmentedControl';
 
 export default function SavingsPage() {
   const {
@@ -62,6 +64,20 @@ export default function SavingsPage() {
   const { toast, showToast, hideToast } = useToast();
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
+
+  // Track previous mode to determine directional slide animation
+  const prevModeRef = useRef(mode);
+  const [slideDirection, setSlideDirection] = useState(null);
+  const slideKeyRef = useRef(0);
+
+  const handleModeChange = useCallback((newMode) => {
+    if (newMode === mode) return;
+    // growth -> goal = slide left; goal -> growth = slide right
+    setSlideDirection(newMode === 'goal' ? 'left' : 'right');
+    slideKeyRef.current += 1;
+    prevModeRef.current = mode;
+    setMode(newMode);
+  }, [mode, setMode]);
 
   const handleOpenShare = React.useCallback(() => {
     const url = generateSavingsShareUrl(getShareState());
@@ -121,7 +137,7 @@ export default function SavingsPage() {
   const summary = activeProjection?.summary;
 
   return (
-    <main className="container" id="main-content">
+    <main className="container page-route-enter" id="main-content">
       {/* Page Title & Intro */}
       <section className="section" style={{ paddingBottom: '20px' }}>
         <div style={{ maxWidth: '720px' }}>
@@ -135,91 +151,93 @@ export default function SavingsPage() {
           }}>
             Financial planning tool
           </div>
-          <h1 style={{ margin: 0 }}>Savings Calculator</h1>
+          <h1 style={{ margin: 0 }}>
+            <WordReveal text="Savings Calculator" />
+          </h1>
         </div>
 
-        {/* Mode Selector Tabs */}
+        {/* Mode Selector Tabs — Animated Sliding Pill */}
         <div style={{ marginTop: '24px' }}>
-          <div className="segmented-control" style={{ padding: '4px' }} role="tablist" aria-label="Calculator mode">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'growth'}
-              className={`segment-btn ${mode === 'growth' ? 'active' : ''}`}
-              style={{ padding: '8px 24px', fontSize: '0.9rem' }}
-              onClick={() => setMode('growth')}
-            >
-              Growth Projection
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'goal'}
-              className={`segment-btn ${mode === 'goal' ? 'active' : ''}`}
-              style={{ padding: '8px 24px', fontSize: '0.9rem' }}
-              onClick={() => setMode('goal')}
-            >
-              Reach a Goal
-            </button>
-          </div>
+          <AnimatedSegmentedControl
+            options={[
+              { value: 'growth', label: 'Growth Projection' },
+              { value: 'goal', label: 'Reach a Goal' },
+            ]}
+            value={mode}
+            onChange={handleModeChange}
+            ariaLabel="Calculator mode"
+            style={{ padding: '4px' }}
+            buttonStyle={{ padding: '8px 24px', fontSize: '0.9rem' }}
+          />
         </div>
       </section>
 
-      {/* Primary Calculator Workspace */}
-      <RevealSection className="calculator-shell">
-        {/* Left Column: Inputs */}
-        <section className="calculator-inputs" aria-labelledby="savings-parameters-heading">
+      {/* Primary Calculator Workspace with Directional Entrances */}
+      <div className="calculator-shell">
+        {/* Left Column: Inputs gliding in from upper-left */}
+        <RevealSection
+          as="section"
+          direction="left"
+          delay={40}
+          className="calculator-inputs"
+          aria-labelledby="savings-parameters-heading"
+        >
           <h2 id="savings-parameters-heading" style={{ fontSize: '1.25rem', marginBottom: '20px' }}>
             {mode === 'growth' ? 'Savings parameters' : 'Goal parameters'}
           </h2>
 
-          {mode === 'growth' ? (
-            <SavingsInputs
-              startingBalance={startingBalance}
-              onStartingBalanceChange={setStartingBalance}
-              contributionAmount={contributionAmount}
-              onContributionAmountChange={setContributionAmount}
-              contributionFrequency={contributionFrequency}
-              onContributionFrequencyChange={setContributionFrequency}
-              annualRate={annualRate}
-              onAnnualRateChange={setAnnualRate}
-              rateType={rateType}
-              onRateTypeChange={setRateType}
-              compoundingFrequency={compoundingFrequency}
-              onCompoundingFrequencyChange={setCompoundingFrequency}
-              timeYears={timeYears}
-              onTimeYearsChange={setTimeYears}
-              timeMonths={timeMonths}
-              onTimeMonthsChange={setTimeMonths}
-              currency={currency}
-              errors={validationErrors}
-            />
-          ) : (
-            <SavingsGoalInputs
-              goalSubMode={goalSubMode}
-              onGoalSubModeChange={setGoalSubMode}
-              targetAmount={targetAmount}
-              onTargetAmountChange={setTargetAmount}
-              currentSavings={startingBalance}
-              onCurrentSavingsChange={setStartingBalance}
-              goalContribution={goalContribution}
-              onGoalContributionChange={setGoalContribution}
-              contributionFrequency={contributionFrequency}
-              onContributionFrequencyChange={setContributionFrequency}
-              annualRate={annualRate}
-              onAnnualRateChange={setAnnualRate}
-              rateType={rateType}
-              onRateTypeChange={setRateType}
-              compoundingFrequency={compoundingFrequency}
-              onCompoundingFrequencyChange={setCompoundingFrequency}
-              timeYears={timeYears}
-              onTimeYearsChange={setTimeYears}
-              timeMonths={timeMonths}
-              onTimeMonthsChange={setTimeMonths}
-              currency={currency}
-              errors={validationErrors}
-            />
-          )}
+          <div
+            key={`${mode}-${slideKeyRef.current}`}
+            className={slideDirection ? `mode-slide-${slideDirection}-enter` : 'page-route-enter'}
+          >
+            {mode === 'growth' ? (
+              <SavingsInputs
+                startingBalance={startingBalance}
+                onStartingBalanceChange={setStartingBalance}
+                contributionAmount={contributionAmount}
+                onContributionAmountChange={setContributionAmount}
+                contributionFrequency={contributionFrequency}
+                onContributionFrequencyChange={setContributionFrequency}
+                annualRate={annualRate}
+                onAnnualRateChange={setAnnualRate}
+                rateType={rateType}
+                onRateTypeChange={setRateType}
+                compoundingFrequency={compoundingFrequency}
+                onCompoundingFrequencyChange={setCompoundingFrequency}
+                timeYears={timeYears}
+                onTimeYearsChange={setTimeYears}
+                timeMonths={timeMonths}
+                onTimeMonthsChange={setTimeMonths}
+                currency={currency}
+                errors={validationErrors}
+              />
+            ) : (
+              <SavingsGoalInputs
+                goalSubMode={goalSubMode}
+                onGoalSubModeChange={setGoalSubMode}
+                targetAmount={targetAmount}
+                onTargetAmountChange={setTargetAmount}
+                currentSavings={startingBalance}
+                onCurrentSavingsChange={setStartingBalance}
+                goalContribution={goalContribution}
+                onGoalContributionChange={setGoalContribution}
+                contributionFrequency={contributionFrequency}
+                onContributionFrequencyChange={setContributionFrequency}
+                annualRate={annualRate}
+                onAnnualRateChange={setAnnualRate}
+                rateType={rateType}
+                onRateTypeChange={setRateType}
+                compoundingFrequency={compoundingFrequency}
+                onCompoundingFrequencyChange={setCompoundingFrequency}
+                timeYears={timeYears}
+                onTimeYearsChange={setTimeYears}
+                timeMonths={timeMonths}
+                onTimeMonthsChange={setTimeMonths}
+                currency={currency}
+                errors={validationErrors}
+              />
+            )}
+          </div>
 
           {/* Advanced Assumptions Accordion */}
           <SavingsAdvancedOptions
@@ -248,10 +266,16 @@ export default function SavingsPage() {
             baseRate={annualRate}
             currency={currency}
           />
-        </section>
+        </RevealSection>
 
-        {/* Right Column: Live Result Hero & Breakdown */}
-        <section className="calculator-results" aria-labelledby="savings-results-heading">
+        {/* Right Column: Live Result Hero & Breakdown gliding in from upper-right */}
+        <RevealSection
+          as="section"
+          direction="right"
+          delay={90}
+          className="calculator-results"
+          aria-labelledby="savings-results-heading"
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h2 id="savings-results-heading" style={{ fontSize: '1.25rem', margin: 0 }}>
               Your projection
@@ -290,20 +314,22 @@ export default function SavingsPage() {
             </div>
           </div>
 
-          <SavingsResultHero
-            mode={mode}
-            summary={summary}
-            currency={currency}
-            isValid={isValid}
-            requiredContribution={requiredContribution}
-            timeToGoal={timeToGoal}
-            goalSubMode={goalSubMode}
-            targetAmount={targetAmount}
-            startingBalance={startingBalance}
-            contributionFrequency={contributionFrequency}
-            timeYears={timeYears}
-            timeMonths={timeMonths}
-          />
+          <div key={`${mode}-${slideKeyRef.current}-${goalSubMode}`} className="page-route-enter">
+            <SavingsResultHero
+              mode={mode}
+              summary={summary}
+              currency={currency}
+              isValid={isValid}
+              requiredContribution={requiredContribution}
+              timeToGoal={timeToGoal}
+              goalSubMode={goalSubMode}
+              targetAmount={targetAmount}
+              startingBalance={startingBalance}
+              contributionFrequency={contributionFrequency}
+              timeYears={timeYears}
+              timeMonths={timeMonths}
+            />
+          </div>
 
           <SavingsMetricGrid
             summary={summary}
@@ -314,8 +340,8 @@ export default function SavingsPage() {
             annualRate={annualRate}
             rateType={rateType}
           />
-        </section>
-      </RevealSection>
+        </RevealSection>
+      </div>
 
       {/* Rate Scenario Comparison (if enabled) */}
       {scenarioEnabled && (

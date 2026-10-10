@@ -1,5 +1,6 @@
 import React from 'react';
 import NumericInput from './NumericInput';
+import AnimatedSegmentedControl from './AnimatedSegmentedControl';
 
 const quickTargetsSouthAsian = [
   { label: '10 Lakhs', value: 1000000 },
@@ -47,24 +48,16 @@ export default function SavingsGoalInputs({
       {/* ─── Goal Sub-Mode Toggle ─── */}
       <div style={{ marginBottom: '20px' }}>
         <label className="input-label" style={{ marginBottom: '8px' }}>What do you want to calculate?</label>
-        <div className="segmented-control" style={{ width: '100%', display: 'flex' }} role="group" aria-label="Goal calculation goal mode">
-          <button
-            type="button"
-            className={`segment-btn ${goalSubMode === 'contribution' ? 'active' : ''}`}
-            style={{ flex: 1, textAlign: 'center' }}
-            onClick={() => onGoalSubModeChange('contribution')}
-          >
-            Required Contribution
-          </button>
-          <button
-            type="button"
-            className={`segment-btn ${goalSubMode === 'time' ? 'active' : ''}`}
-            style={{ flex: 1, textAlign: 'center' }}
-            onClick={() => onGoalSubModeChange('time')}
-          >
-            Time to Goal
-          </button>
-        </div>
+        <AnimatedSegmentedControl
+          options={[
+            { value: 'contribution', label: 'Required Contribution' },
+            { value: 'time', label: 'Time to Goal' },
+          ]}
+          value={goalSubMode}
+          onChange={onGoalSubModeChange}
+          ariaLabel="Goal calculation mode"
+          fullWidth
+        />
       </div>
 
       {/* ─── Target Amount ─── */}
@@ -129,105 +122,93 @@ export default function SavingsGoalInputs({
       </div>
 
       {/* ─── If Sub-mode is "time": Regular Contribution Input ─── */}
-      {goalSubMode === 'time' && (
-        <div className="input-group">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <label className="input-label" htmlFor="goal-contribution-input" style={{ marginBottom: 0 }}>
-              Regular contribution
-            </label>
-            <div className="segmented-control" role="group" aria-label="Goal contribution frequency">
-              <button
-                type="button"
-                className={`segment-btn ${contributionFrequency === 'monthly' ? 'active' : ''}`}
-                onClick={() => onContributionFrequencyChange('monthly')}
-              >
-                Monthly
-              </button>
-              <button
-                type="button"
-                className={`segment-btn ${contributionFrequency === 'yearly' ? 'active' : ''}`}
-                onClick={() => onContributionFrequencyChange('yearly')}
-              >
-                Yearly
-              </button>
-            </div>
-          </div>
-
-          <div className="input-wrapper">
-            <span className="input-prefix">{currency}</span>
-            <NumericInput
-              id="goal-contribution-input"
-              className="input-field has-prefix"
-              value={goalContribution}
-              onChange={onGoalContributionChange}
-              isDecimal={false}
-              min={0}
-              placeholder="e.g. 10000"
-            />
-            <span className="input-suffix">/{contributionFrequency === 'yearly' ? 'yr' : 'mo'}</span>
-          </div>
-        </div>
-      )}
-
-      {/* ─── If Sub-mode is "contribution": Time Horizon Input ─── */}
-      {goalSubMode === 'contribution' && (
-        <div className="input-group">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <label className="input-label" style={{ marginBottom: 0 }}>Target timeline</label>
-            <div className="segmented-control" role="group" aria-label="Target timeline frequency">
-              <button
-                type="button"
-                className={`segment-btn ${contributionFrequency === 'monthly' ? 'active' : ''}`}
-                onClick={() => onContributionFrequencyChange('monthly')}
-              >
-                Monthly
-              </button>
-              <button
-                type="button"
-                className={`segment-btn ${contributionFrequency === 'yearly' ? 'active' : ''}`}
-                onClick={() => onContributionFrequencyChange('yearly')}
-              >
-                Yearly
-              </button>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div className="input-wrapper">
-              <NumericInput
-                id="goal-time-years-input"
-                className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
-                value={timeYears}
-                onChange={onTimeYearsChange}
-                isDecimal={false}
-                min={0}
-                max={50}
-                placeholder="5"
-                aria-label="Target years"
+      {/* ─── Dynamic Sub-mode Input Block with Smooth Cross-Fade ─── */}
+      <div key={goalSubMode} className="page-route-enter">
+        {goalSubMode === 'time' ? (
+          <div className="input-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label className="input-label" htmlFor="goal-contribution-input" style={{ marginBottom: 0 }}>
+                Regular contribution
+              </label>
+              <AnimatedSegmentedControl
+                options={[
+                  { value: 'monthly', label: 'Monthly' },
+                  { value: 'yearly', label: 'Yearly' },
+                ]}
+                value={contributionFrequency}
+                onChange={onContributionFrequencyChange}
+                ariaLabel="Goal contribution frequency"
+                size="sm"
               />
-              <span className="input-suffix">Years</span>
             </div>
 
             <div className="input-wrapper">
+              <span className="input-prefix">{currency}</span>
               <NumericInput
-                id="goal-time-months-input"
-                className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
-                value={timeMonths}
-                onChange={onTimeMonthsChange}
+                id="goal-contribution-input"
+                className="input-field has-prefix"
+                value={goalContribution}
+                onChange={onGoalContributionChange}
                 isDecimal={false}
                 min={0}
-                max={11}
-                placeholder="0"
-                aria-label="Target months"
+                placeholder="e.g. 10000"
               />
-              <span className="input-suffix">Months</span>
+              <span className="input-suffix">/{contributionFrequency === 'yearly' ? 'yr' : 'mo'}</span>
             </div>
           </div>
-          {errors.timeHorizon && (
-            <div className="error-message">{errors.timeHorizon}</div>
-          )}
-        </div>
-      )}
+        ) : (
+          <div className="input-group">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label className="input-label" style={{ marginBottom: 0 }}>Target timeline</label>
+              <AnimatedSegmentedControl
+                options={[
+                  { value: 'monthly', label: 'Monthly' },
+                  { value: 'yearly', label: 'Yearly' },
+                ]}
+                value={contributionFrequency}
+                onChange={onContributionFrequencyChange}
+                ariaLabel="Target timeline frequency"
+                size="sm"
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="input-wrapper">
+                <NumericInput
+                  id="goal-time-years-input"
+                  className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
+                  value={timeYears}
+                  onChange={onTimeYearsChange}
+                  isDecimal={false}
+                  min={0}
+                  max={50}
+                  placeholder="5"
+                  aria-label="Target years"
+                />
+                <span className="input-suffix">Years</span>
+              </div>
+
+              <div className="input-wrapper">
+                <NumericInput
+                  id="goal-time-months-input"
+                  className={`input-field has-suffix ${errors.timeHorizon ? 'input-error' : ''}`}
+                  value={timeMonths}
+                  onChange={onTimeMonthsChange}
+                  isDecimal={false}
+                  min={0}
+                  max={11}
+                  placeholder="0"
+                  aria-label="Target months"
+                />
+                <span className="input-suffix">Months</span>
+              </div>
+            </div>
+            {errors.timeHorizon && (
+              <div className="error-message">{errors.timeHorizon}</div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* ─── Annual Rate & Compounding ─── */}
       <div className="input-group">
@@ -235,22 +216,16 @@ export default function SavingsGoalInputs({
           <label className="input-label" htmlFor="goal-annual-rate-input" style={{ marginBottom: 0 }}>
             Expected annual rate
           </label>
-          <div className="segmented-control" role="group" aria-label="Goal rate type">
-            <button
-              type="button"
-              className={`segment-btn ${rateType === 'nominal' ? 'active' : ''}`}
-              onClick={() => onRateTypeChange('nominal')}
-            >
-              Interest Rate
-            </button>
-            <button
-              type="button"
-              className={`segment-btn ${rateType === 'apy' ? 'active' : ''}`}
-              onClick={() => onRateTypeChange('apy')}
-            >
-              APY
-            </button>
-          </div>
+          <AnimatedSegmentedControl
+            options={[
+              { value: 'nominal', label: 'Interest Rate' },
+              { value: 'apy', label: 'APY' },
+            ]}
+            value={rateType}
+            onChange={onRateTypeChange}
+            ariaLabel="Goal rate type"
+            size="sm"
+          />
         </div>
 
         <div className="input-wrapper">

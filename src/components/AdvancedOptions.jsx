@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NumericInput from './NumericInput';
+import AnimatedSegmentedControl from './AnimatedSegmentedControl';
 
 export default function AdvancedOptions({
   processingFeeEnabled,
@@ -44,8 +45,12 @@ export default function AdvancedOptions({
         </svg>
       </button>
       
-      {isOpen && (
-        <div id="advanced-options-content" className="accordion-content">
+      <div 
+        id="advanced-options-content" 
+        className={`accordion-collapse ${isOpen ? 'open' : ''}`}
+        aria-hidden={!isOpen}
+      >
+        <div className="accordion-collapse-inner">
           <div className="accordion-body">
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
@@ -62,53 +67,51 @@ export default function AdvancedOptions({
               </div>
             </div>
 
-            {processingFeeEnabled && (
-              <div style={{ marginTop: '16px', padding: '16px', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
-                <label className="input-label" style={{ marginBottom: '8px' }}>Fee structure</label>
-                <div className="segmented-control" style={{ marginBottom: '16px', width: '100%', display: 'flex' }}>
-                  <button 
-                    type="button"
-                    className={`segment-btn ${processingFeeType === 'percentage' ? 'active' : ''}`}
-                    onClick={() => onProcessingFeeTypeChange('percentage')}
-                    style={{ flex: 1 }}
-                  >
-                    Percentage (%)
-                  </button>
-                  <button 
-                    type="button"
-                    className={`segment-btn ${processingFeeType === 'fixed' ? 'active' : ''}`}
-                    onClick={() => onProcessingFeeTypeChange('fixed')}
-                    style={{ flex: 1 }}
-                  >
-                    Fixed amount ({currency})
-                  </button>
-                </div>
+            <div 
+              className={`accordion-collapse ${processingFeeEnabled ? 'open' : ''}`}
+              aria-hidden={!processingFeeEnabled}
+            >
+              <div className="accordion-collapse-inner">
+                <div style={{ marginTop: '8px', padding: '16px', backgroundColor: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)' }}>
+                  <label className="input-label" style={{ marginBottom: '8px' }}>Fee structure</label>
+                  <AnimatedSegmentedControl
+                    options={[
+                      { value: 'percentage', label: 'Percentage (%)' },
+                      { value: 'fixed', label: `Fixed amount (${currency})` },
+                    ]}
+                    value={processingFeeType}
+                    onChange={onProcessingFeeTypeChange}
+                    ariaLabel="Fee structure"
+                    fullWidth
+                    style={{ marginBottom: '16px' }}
+                  />
 
-                <div className="input-group" style={{ marginBottom: 0 }}>
-                  <label className="input-label" htmlFor="fee-value-input">
-                    {processingFeeType === 'percentage' ? 'Fee percentage' : 'Fee amount'}
-                  </label>
-                  <div className="input-wrapper">
-                    {processingFeeType === 'fixed' && <span className="input-prefix">{currency}</span>}
-                    <NumericInput 
-                      key={processingFeeType}
-                      id="fee-value-input"
-                      value={processingFeeValue} 
-                      onChange={(val) => onProcessingFeeValueChange(val === '' ? 0 : val)}
-                      isDecimal={processingFeeType === 'percentage'}
-                      fallbackOnBlur={true}
-                      fallbackValue={0}
-                      className={`input-field ${processingFeeType === 'fixed' ? 'has-prefix' : 'has-suffix'}`}
-                      placeholder={processingFeeType === 'percentage' ? '1.0' : '10000'}
-                    />
-                    {processingFeeType === 'percentage' && <span className="input-suffix">%</span>}
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label className="input-label" htmlFor="fee-value-input">
+                      {processingFeeType === 'percentage' ? 'Fee percentage' : 'Fee amount'}
+                    </label>
+                    <div className="input-wrapper">
+                      {processingFeeType === 'fixed' && <span className="input-prefix">{currency}</span>}
+                      <NumericInput 
+                        key={processingFeeType}
+                        id="fee-value-input"
+                        value={processingFeeValue} 
+                        onChange={(val) => onProcessingFeeValueChange(val === '' ? 0 : val)}
+                        isDecimal={processingFeeType === 'percentage'}
+                        fallbackOnBlur={true}
+                        fallbackValue={0}
+                        className={`input-field ${processingFeeType === 'fixed' ? 'has-prefix' : 'has-suffix'}`}
+                        placeholder={processingFeeType === 'percentage' ? '1.0' : '10000'}
+                      />
+                      {processingFeeType === 'percentage' && <span className="input-suffix">%</span>}
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

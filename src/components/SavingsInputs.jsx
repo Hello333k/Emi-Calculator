@@ -1,5 +1,6 @@
 import React from 'react';
 import NumericInput from './NumericInput';
+import AnimatedSegmentedControl from './AnimatedSegmentedControl';
 
 const quickStartSouthAsian = [
   { label: '0', value: 0 },
@@ -115,22 +116,16 @@ export default function SavingsInputs({
             Regular contribution
           </label>
           {/* Frequency Toggle */}
-          <div className="segmented-control" role="group" aria-label="Contribution frequency">
-            <button
-              type="button"
-              className={`segment-btn ${contributionFrequency === 'monthly' ? 'active' : ''}`}
-              onClick={() => onContributionFrequencyChange('monthly')}
-            >
-              Monthly
-            </button>
-            <button
-              type="button"
-              className={`segment-btn ${contributionFrequency === 'yearly' ? 'active' : ''}`}
-              onClick={() => onContributionFrequencyChange('yearly')}
-            >
-              Yearly
-            </button>
-          </div>
+          <AnimatedSegmentedControl
+            options={[
+              { value: 'monthly', label: 'Monthly' },
+              { value: 'yearly', label: 'Yearly' },
+            ]}
+            value={contributionFrequency}
+            onChange={onContributionFrequencyChange}
+            ariaLabel="Contribution frequency"
+            size="sm"
+          />
         </div>
 
         <div className="input-wrapper">
@@ -176,24 +171,16 @@ export default function SavingsInputs({
             Annual rate
           </label>
           {/* Rate Type Selector */}
-          <div className="segmented-control" role="group" aria-label="Rate type">
-            <button
-              type="button"
-              className={`segment-btn ${rateType === 'nominal' ? 'active' : ''}`}
-              onClick={() => onRateTypeChange('nominal')}
-              title="Nominal annual interest rate (e.g. quoted APR)"
-            >
-              Interest Rate
-            </button>
-            <button
-              type="button"
-              className={`segment-btn ${rateType === 'apy' ? 'active' : ''}`}
-              onClick={() => onRateTypeChange('apy')}
-              title="Annual Percentage Yield (APY reflects compounding)"
-            >
-              APY
-            </button>
-          </div>
+          <AnimatedSegmentedControl
+            options={[
+              { value: 'nominal', label: 'Interest Rate', title: 'Nominal annual interest rate (e.g. quoted APR)' },
+              { value: 'apy', label: 'APY', title: 'Annual Percentage Yield (APY reflects compounding)' },
+            ]}
+            value={rateType}
+            onChange={onRateTypeChange}
+            ariaLabel="Rate type"
+            size="sm"
+          />
         </div>
 
         <div className="input-wrapper">

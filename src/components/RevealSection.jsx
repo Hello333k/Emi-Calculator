@@ -15,22 +15,32 @@ import { useReveal } from '../hooks/useReveal';
  */
 export default function RevealSection({
   as: Tag = 'div',
+  direction = 'up',
   delay = 0,
+  duration,
+  immediate = false,
+  threshold = 0.08,
+  rootMargin = '0px 0px -30px 0px',
+  once = true,
   style,
   className = '',
   children,
   ...rest
 }) {
-  const ref = useReveal();
+  const ref = useReveal({ threshold, rootMargin, once, immediate });
 
-  const mergedStyle = delay > 0
-    ? { ...style, transitionDelay: `${delay}ms` }
-    : style;
+  const directionClass = direction && direction !== 'none' ? `reveal--${direction}` : '';
+
+  const mergedStyle = {
+    ...style,
+    ...(delay > 0 ? { transitionDelay: `${delay}ms` } : {}),
+    ...(duration ? { transitionDuration: `${duration}ms` } : {}),
+  };
 
   return (
     <Tag
       ref={ref}
-      className={`reveal ${className}`}
+      className={`reveal ${directionClass} ${className}`.trim()}
       style={mergedStyle}
       {...rest}
     >

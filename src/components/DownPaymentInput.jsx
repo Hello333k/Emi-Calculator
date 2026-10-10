@@ -1,6 +1,7 @@
 import React from 'react';
 import { formatCurrency } from '../utils/formatters';
 import NumericInput from './NumericInput';
+import AnimatedSegmentedControl from './AnimatedSegmentedControl';
 
 export default function DownPaymentInput({
   purchasePrice,
@@ -43,22 +44,16 @@ export default function DownPaymentInput({
     <div className="input-group">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
         <label className="input-label" htmlFor="down-payment-input" style={{ marginBottom: 0 }}>Down payment</label>
-        <div className="segmented-control">
-          <button
-            type="button"
-            className={`segment-btn ${!isPercentage ? 'active' : ''}`}
-            onClick={() => handleModeSwitch('amount')}
-          >
-            Amount
-          </button>
-          <button
-            type="button"
-            className={`segment-btn ${isPercentage ? 'active' : ''}`}
-            onClick={() => handleModeSwitch('percentage')}
-          >
-            Percentage
-          </button>
-        </div>
+        <AnimatedSegmentedControl
+          options={[
+            { value: 'amount', label: 'Amount' },
+            { value: 'percentage', label: 'Percentage' },
+          ]}
+          value={downPaymentMode}
+          onChange={handleModeSwitch}
+          ariaLabel="Down payment type"
+          size="sm"
+        />
       </div>
 
       <div className="input-wrapper">

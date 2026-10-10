@@ -1,4 +1,5 @@
 import { formatCurrency } from '../utils/formatters';
+import AnimatedNumber from './AnimatedNumber';
 
 export default function MetricGrid({
   purchasePrice,
@@ -13,6 +14,8 @@ export default function MetricGrid({
   isValid
 }) {
   const hasDownPayment = downPaymentAmount > 0;
+  const formatVal = (val) => formatCurrency(val, currency);
+
   return (
     <div className="metric-grid">
       {hasDownPayment && (
@@ -20,13 +23,13 @@ export default function MetricGrid({
           <div className="metric-card">
             <div className="metric-card-label">Purchase price</div>
             <div className="metric-card-value">
-              {isValid ? formatCurrency(purchasePrice, currency) : '—'}
+              {isValid ? <AnimatedNumber value={purchasePrice} formatter={formatVal} duration={480} /> : '—'}
             </div>
           </div>
           <div className="metric-card" style={{ borderLeft: '3px solid var(--color-success)' }}>
             <div className="metric-card-label">Down payment</div>
             <div className="metric-card-value" style={{ color: 'var(--color-success)' }}>
-              {isValid ? formatCurrency(downPaymentAmount, currency) : '—'}
+              {isValid ? <AnimatedNumber value={downPaymentAmount} formatter={formatVal} duration={480} /> : '—'}
             </div>
           </div>
         </>
@@ -34,19 +37,19 @@ export default function MetricGrid({
       <div className="metric-card metric-card--principal">
         <div className="metric-card-label">{hasDownPayment ? 'Loan amount' : 'Total principal'}</div>
         <div className="metric-card-value">
-          {isValid ? formatCurrency(financedPrincipal, currency) : '—'}
+          {isValid ? <AnimatedNumber value={financedPrincipal} formatter={formatVal} duration={480} /> : '—'}
         </div>
       </div>
       <div className="metric-card metric-card--interest">
         <div className="metric-card-label">Total interest</div>
         <div className="metric-card-value">
-          {isValid ? formatCurrency(totalInterest, currency) : '—'}
+          {isValid ? <AnimatedNumber value={totalInterest} formatter={formatVal} duration={480} /> : '—'}
         </div>
       </div>
       <div className="metric-card">
         <div className="metric-card-label">Total repayment</div>
         <div className="metric-card-value">
-          {isValid ? formatCurrency(totalRepayment, currency) : '—'}
+          {isValid ? <AnimatedNumber value={totalRepayment} formatter={formatVal} duration={480} /> : '—'}
         </div>
       </div>
       {hasDownPayment && (
@@ -62,13 +65,13 @@ export default function MetricGrid({
           <div className="metric-card">
             <div className="metric-card-label">Processing fee</div>
             <div className="metric-card-value">
-              {isValid ? formatCurrency(processingFee, currency) : '—'}
+              {isValid ? <AnimatedNumber value={processingFee} formatter={formatVal} duration={480} /> : '—'}
             </div>
           </div>
           <div className="metric-card">
             <div className="metric-card-label">Total cost</div>
             <div className="metric-card-value">
-              {isValid ? formatCurrency(totalCost, currency) : '—'}
+              {isValid ? <AnimatedNumber value={totalCost} formatter={formatVal} duration={480} /> : '—'}
             </div>
           </div>
         </>

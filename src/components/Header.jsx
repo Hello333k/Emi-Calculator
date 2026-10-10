@@ -74,7 +74,7 @@ export default function Header({
         </select>
         
         <button 
-          className="theme-toggle" 
+          className="theme-toggle btn-theme" 
           onClick={onThemeToggle} 
           title={theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance'}
           aria-label={theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance'}
@@ -99,7 +99,7 @@ export default function Header({
         </button>
 
         <button 
-          className="theme-toggle" 
+          className="theme-toggle btn-reset" 
           onClick={onReset} 
           title="Reset to default values"
           aria-label="Reset calculator to defaults"
@@ -112,7 +112,7 @@ export default function Header({
         </button>
 
         <button 
-          className="theme-toggle" 
+          className="theme-toggle btn-share" 
           onClick={onShare} 
           title="Share calculation"
           aria-label="Share calculation link"

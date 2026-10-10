@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { formatCurrency } from '../utils/formatters';
+import AnimatedNumber from './AnimatedNumber';
 
 export default function SavingsResultHero({
   mode,
@@ -55,8 +56,8 @@ export default function SavingsResultHero({
     return (
       <div className="result-hero" aria-live="polite">
         <div className="result-label">Estimated balance</div>
-        <div className="result-value tabular-nums">
-          {formatCurrency(endingBalance, currency)}
+        <div className="result-value">
+          <AnimatedNumber value={endingBalance} formatter={(v) => formatCurrency(v, currency)} duration={520} />
         </div>
 
         <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -95,10 +96,10 @@ export default function SavingsResultHero({
         <div className="result-label">
           {isTargetAlreadyMet ? 'Goal status' : `Required ${freqLabel}ly contribution`}
         </div>
-        <div className="result-value tabular-nums">
+        <div className="result-value">
           {isTargetAlreadyMet 
             ? 'Goal Met!' 
-            : `${formatCurrency(requiredContribution || 0, currency)}`}
+            : <AnimatedNumber value={requiredContribution || 0} formatter={(v) => formatCurrency(v, currency)} duration={520} />}
         </div>
 
         {isTargetAlreadyMet ? (

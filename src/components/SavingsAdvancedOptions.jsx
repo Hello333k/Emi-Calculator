@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NumericInput from './NumericInput';
+import AnimatedSegmentedControl from './AnimatedSegmentedControl';
 
 export default function SavingsAdvancedOptions({
   contributionTiming,
@@ -80,30 +81,28 @@ export default function SavingsAdvancedOptions({
         </svg>
       </button>
 
-      {isOpen && (
-        <div id="savings-advanced-options-content" className="accordion-content">
+      <div
+        id="savings-advanced-options-content"
+        className={`accordion-collapse ${isOpen ? 'open' : ''}`}
+        aria-hidden={!isOpen}
+      >
+        <div className="accordion-collapse-inner">
           <div className="accordion-body" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
             {/* 1. Contribution Timing */}
             <div className="input-group" style={{ marginBottom: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label className="input-label" style={{ marginBottom: 0 }}>Contribution timing</label>
-                <div className="segmented-control" role="group" aria-label="Contribution timing">
-                  <button
-                    type="button"
-                    className={`segment-btn ${contributionTiming === 'end' ? 'active' : ''}`}
-                    onClick={() => onContributionTimingChange('end')}
-                  >
-                    End of period
-                  </button>
-                  <button
-                    type="button"
-                    className={`segment-btn ${contributionTiming === 'beginning' ? 'active' : ''}`}
-                    onClick={() => onContributionTimingChange('beginning')}
-                  >
-                    Beginning of period
-                  </button>
-                </div>
+                <AnimatedSegmentedControl
+                  options={[
+                    { value: 'end', label: 'End of period' },
+                    { value: 'beginning', label: 'Beginning of period' },
+                  ]}
+                  value={contributionTiming}
+                  onChange={onContributionTimingChange}
+                  ariaLabel="Contribution timing"
+                  size="sm"
+                />
               </div>
               <p className="input-helper">
                 {contributionTiming === 'end'
@@ -152,46 +151,51 @@ export default function SavingsAdvancedOptions({
                 <span>One-time additional deposit</span>
               </label>
 
-              {oneTimeDepositEnabled && (
-                <div style={{ marginTop: '14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label" htmlFor="one-time-amount-input">Deposit amount</label>
-                    <div className="input-wrapper">
-                      <span className="input-prefix">{currency}</span>
-                      <NumericInput
-                        id="one-time-amount-input"
-                        className="input-field has-prefix"
-                        value={oneTimeDepositAmount || ''}
-                        onChange={(val) => onOneTimeDepositAmountChange(val === '' ? 0 : val)}
-                        isDecimal={false}
-                        min={0}
-                        fallbackOnBlur={true}
-                        fallbackValue={0}
-                        placeholder="e.g. 50000"
-                      />
+              <div
+                className={`accordion-collapse ${oneTimeDepositEnabled ? 'open' : ''}`}
+                aria-hidden={!oneTimeDepositEnabled}
+              >
+                <div className="accordion-collapse-inner">
+                  <div style={{ marginTop: '14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                      <label className="input-label" htmlFor="one-time-amount-input">Deposit amount</label>
+                      <div className="input-wrapper">
+                        <span className="input-prefix">{currency}</span>
+                        <NumericInput
+                          id="one-time-amount-input"
+                          className="input-field has-prefix"
+                          value={oneTimeDepositAmount || ''}
+                          onChange={(val) => onOneTimeDepositAmountChange(val === '' ? 0 : val)}
+                          isDecimal={false}
+                          min={0}
+                          fallbackOnBlur={true}
+                          fallbackValue={0}
+                          placeholder="e.g. 50000"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="input-group" style={{ marginBottom: 0 }}>
-                    <label className="input-label" htmlFor="one-time-period-input">Deposit at month</label>
-                    <div className="input-wrapper">
-                      <NumericInput
-                        id="one-time-period-input"
-                        className="input-field has-suffix"
-                        value={oneTimeDepositPeriod || ''}
-                        onChange={(val) => onOneTimeDepositPeriodChange(val === '' ? 1 : Math.max(1, val))}
-                        isDecimal={false}
-                        min={1}
-                        max={600}
-                        fallbackOnBlur={true}
-                        fallbackValue={24}
-                        placeholder="24"
-                      />
-                      <span className="input-suffix">Mo</span>
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                      <label className="input-label" htmlFor="one-time-period-input">Deposit at month</label>
+                      <div className="input-wrapper">
+                        <NumericInput
+                          id="one-time-period-input"
+                          className="input-field has-suffix"
+                          value={oneTimeDepositPeriod || ''}
+                          onChange={(val) => onOneTimeDepositPeriodChange(val === '' ? 1 : Math.max(1, val))}
+                          isDecimal={false}
+                          min={1}
+                          max={600}
+                          fallbackOnBlur={true}
+                          fallbackValue={24}
+                          placeholder="24"
+                        />
+                        <span className="input-suffix">Mo</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* 4. Inflation Adjustment */}
@@ -210,28 +214,33 @@ export default function SavingsAdvancedOptions({
                 <span>Adjust for inflation (today&apos;s money value)</span>
               </label>
 
-              {inflationEnabled && (
-                <div style={{ marginTop: '12px' }}>
-                  <div className="input-wrapper">
-                    <NumericInput
-                      id="inflation-rate-input"
-                      className="input-field has-suffix"
-                      value={inflationRate}
-                      onChange={(val) => onInflationRateChange(val === '' ? 0 : val)}
-                      isDecimal={true}
-                      min={0}
-                      max={30}
-                      fallbackOnBlur={true}
-                      fallbackValue={3}
-                      placeholder="3"
-                    />
-                    <span className="input-suffix">% / yr</span>
+              <div
+                className={`accordion-collapse ${inflationEnabled ? 'open' : ''}`}
+                aria-hidden={!inflationEnabled}
+              >
+                <div className="accordion-collapse-inner">
+                  <div style={{ marginTop: '12px' }}>
+                    <div className="input-wrapper">
+                      <NumericInput
+                        id="inflation-rate-input"
+                        className="input-field has-suffix"
+                        value={inflationRate}
+                        onChange={(val) => onInflationRateChange(val === '' ? 0 : val)}
+                        isDecimal={true}
+                        min={0}
+                        max={30}
+                        fallbackOnBlur={true}
+                        fallbackValue={3}
+                        placeholder="3"
+                      />
+                      <span className="input-suffix">% / yr</span>
+                    </div>
+                    <p className="input-helper">
+                      Estimates the real purchasing power of your final projected balance in today&apos;s money.
+                    </p>
                   </div>
-                  <p className="input-helper">
-                    Estimates the real purchasing power of your final projected balance in today&apos;s money.
-                  </p>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* 5. Annual Account Fee */}
@@ -274,61 +283,66 @@ export default function SavingsAdvancedOptions({
                 <span>Compare rate scenarios (sensitivity analysis)</span>
               </label>
 
-              {scenarioEnabled && (
-                <div style={{ marginTop: '12px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
-                    <div>
-                      <label className="text-xs text-secondary" htmlFor="scenario-low-input">Lower rate</label>
-                      <div className="input-wrapper" style={{ marginTop: '4px' }}>
-                        <NumericInput
-                          id="scenario-low-input"
-                          className="input-field has-suffix"
-                          value={scenarioLowerRate}
-                          onChange={(val) => onScenarioLowerRateChange(val === '' ? 0 : val)}
-                          isDecimal={true}
-                          min={0}
-                          style={{ padding: '8px 10px', fontSize: '0.85rem' }}
-                        />
-                        <span className="input-suffix">%</span>
+              <div
+                className={`accordion-collapse ${scenarioEnabled ? 'open' : ''}`}
+                aria-hidden={!scenarioEnabled}
+              >
+                <div className="accordion-collapse-inner">
+                  <div style={{ marginTop: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                      <div>
+                        <label className="text-xs text-secondary" htmlFor="scenario-low-input">Lower rate</label>
+                        <div className="input-wrapper" style={{ marginTop: '4px' }}>
+                          <NumericInput
+                            id="scenario-low-input"
+                            className="input-field has-suffix"
+                            value={scenarioLowerRate}
+                            onChange={(val) => onScenarioLowerRateChange(val === '' ? 0 : val)}
+                            isDecimal={true}
+                            min={0}
+                            style={{ padding: '8px 10px', fontSize: '0.85rem' }}
+                          />
+                          <span className="input-suffix">%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-secondary">Base rate</label>
+                        <div className="input-wrapper" style={{ marginTop: '4px' }}>
+                          <input
+                            type="text"
+                            readOnly
+                            className="input-field has-suffix"
+                            value={baseRate}
+                            style={{ padding: '8px 10px', fontSize: '0.85rem', backgroundColor: 'var(--bg-elevated)', color: 'var(--text-tertiary)' }}
+                          />
+                          <span className="input-suffix">%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-secondary" htmlFor="scenario-high-input">Higher rate</label>
+                        <div className="input-wrapper" style={{ marginTop: '4px' }}>
+                          <NumericInput
+                            id="scenario-high-input"
+                            className="input-field has-suffix"
+                            value={scenarioHigherRate}
+                            onChange={(val) => onScenarioHigherRateChange(val === '' ? 0 : val)}
+                            isDecimal={true}
+                            min={0}
+                            style={{ padding: '8px 10px', fontSize: '0.85rem' }}
+                          />
+                          <span className="input-suffix">%</span>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <label className="text-xs text-secondary">Base rate</label>
-                      <div className="input-wrapper" style={{ marginTop: '4px' }}>
-                        <input
-                          type="text"
-                          readOnly
-                          className="input-field has-suffix"
-                          value={baseRate}
-                          style={{ padding: '8px 10px', fontSize: '0.85rem', backgroundColor: 'var(--bg-elevated)', color: 'var(--text-tertiary)' }}
-                        />
-                        <span className="input-suffix">%</span>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-xs text-secondary" htmlFor="scenario-high-input">Higher rate</label>
-                      <div className="input-wrapper" style={{ marginTop: '4px' }}>
-                        <NumericInput
-                          id="scenario-high-input"
-                          className="input-field has-suffix"
-                          value={scenarioHigherRate}
-                          onChange={(val) => onScenarioHigherRateChange(val === '' ? 0 : val)}
-                          isDecimal={true}
-                          min={0}
-                          style={{ padding: '8px 10px', fontSize: '0.85rem' }}
-                        />
-                        <span className="input-suffix">%</span>
-                      </div>
-                    </div>
+                    <p className="input-helper">Compares hypothetical outcome variations without implying guaranteed performance.</p>
                   </div>
-                  <p className="input-helper">Compares hypothetical outcome variations without implying guaranteed performance.</p>
                 </div>
-              )}
+              </div>
             </div>
 
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

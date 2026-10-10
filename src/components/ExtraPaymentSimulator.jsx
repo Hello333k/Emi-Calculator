@@ -51,8 +51,12 @@ export default function ExtraPaymentSimulator({
           </svg>
         </button>
         
-        {isOpen && (
-          <div id="extra-payment-content" className="accordion-content">
+        <div 
+          id="extra-payment-content" 
+          className={`accordion-collapse ${isOpen ? 'open' : ''}`}
+          aria-hidden={!isOpen}
+        >
+          <div className="accordion-collapse-inner">
             <div className="accordion-body">
               <p className="text-secondary text-small" style={{ marginBottom: '20px' }}>
                 Simulate paying more towards the loan principal. Extra payments go directly towards reducing principal balance, shortening tenure and saving total interest.
@@ -158,7 +162,7 @@ export default function ExtraPaymentSimulator({
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

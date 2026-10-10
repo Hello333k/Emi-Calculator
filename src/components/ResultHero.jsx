@@ -1,12 +1,17 @@
 import { formatCurrency } from '../utils/formatters';
+import AnimatedNumber from './AnimatedNumber';
 
 export default function ResultHero({ emi, currency, isValid, financedPrincipal, downPaymentAmount }) {
   const hasDownPayment = downPaymentAmount > 0;
+  const formatter = (val) => formatCurrency(val, currency);
+
   return (
     <div className="result-hero" aria-live="polite">
       <div className="result-label">Estimated monthly EMI</div>
-      <div className="result-value tabular-nums">
-        {isValid ? formatCurrency(emi, currency) : '—'}
+      <div className="result-value">
+        {isValid ? (
+          <AnimatedNumber value={emi} formatter={formatter} duration={520} />
+        ) : '—'}
       </div>
       {isValid && hasDownPayment && (
         <div style={{ marginTop: '12px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
